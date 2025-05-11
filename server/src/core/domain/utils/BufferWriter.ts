@@ -2,7 +2,7 @@ export default class BufferWriter {
     private readonly dataview: DataView;
 
     public get buffer(): Buffer {
-        return Buffer.from(this.dataview.buffer.slice(0, this.offset));
+        return Buffer.from(this.dataview.buffer.slice(this.dataview.byteOffset, this.dataview.byteOffset + this.dataview.byteLength));
     }
 
     private offset: number = 0;
@@ -13,8 +13,7 @@ export default class BufferWriter {
     constructor(
         buffer: Buffer 
     ) {
-        this.dataview = new DataView(Buffer.from(buffer).buffer);
-        
+        this.dataview = new DataView(buffer.buffer, buffer.byteOffset, buffer.length);
     }
 
     private assertBufferSize(size: number): void { 
