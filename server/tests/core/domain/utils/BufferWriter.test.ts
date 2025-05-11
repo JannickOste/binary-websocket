@@ -168,23 +168,31 @@ describe("BufferWriter", () => {
     });
 
     describe("writeBoolean", () => {
-        test("Writes correct value", () => {
+        test("Writes correct value for true", () => {
             const buffer = Buffer.alloc(1);
             const writer = new TestBufferWriter(buffer);
-
+    
             writer.writeBoolean(true);
             expect(buffer[0]).toBe(1);
         });
-
+    
+        test("Writes correct value for false", () => {
+            const buffer = Buffer.alloc(1);
+            const writer = new TestBufferWriter(buffer);
+    
+            writer.writeBoolean(false);
+            expect(buffer[0]).toBe(0);
+        });
+    
         test("Increments current offset after writing a boolean", () => {
             const buffer = Buffer.alloc(1);
             const writer = new TestBufferWriter(buffer);
-
+    
             writer.writeBoolean(true);
             expect(writer.currentOffset).toBe(1);
         });
     });
-
+    
     describe("writeBuffer", () => {
         test("Writes correct value", () => {
             const buffer = Buffer.alloc(8);
