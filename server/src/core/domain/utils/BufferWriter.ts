@@ -16,56 +16,56 @@ export default class BufferWriter {
         this.dataview = new DataView(buffer.buffer, buffer.byteOffset, buffer.length);
     }
 
-    private assertBufferSize(size: number): void { 
+    protected assertBufferSize(size: number): void { 
 
         if (this.offset + size > this.dataview.byteLength) {
-            throw new Error("Packet size exceeds the maximum allowed size");
+            throw new Error("BufferOverflow: Not enough space in buffer to write data");
         }
     }
 
-    public writeByte(value: number): void 
+    protected writeByte(value: number): void 
     {
         this.assertBufferSize(1);
         this.dataview.setInt8(this.offset, value);
         this.offset++;
     }
 
-    public writeShort(value: number, littleEndian: boolean = true): void {
+    protected writeShort(value: number, littleEndian: boolean = true): void {
         this.assertBufferSize(2);
 
         this.dataview.setInt16(this.offset, value, littleEndian);
         this.offset += 2;
     }
 
-    public writeInt(value: number, littleEndian: boolean = true): void {
+    protected writeInt(value: number, littleEndian: boolean = true): void {
         this.assertBufferSize(4);
         
         this.dataview.setInt32(this.offset, value, littleEndian);
         this.offset += 4;
     }
 
-    public writeFloat32(value: number, littleEndian: boolean = true): void {
+    protected writeFloat32(value: number, littleEndian: boolean = true): void {
         this.assertBufferSize(4);
 
         this.dataview.setFloat32(this.offset, value, littleEndian);
         this.offset += 4;
     }
 
-    public writeFloat64(value: number, littleEndian: boolean = true): void {
+    protected writeFloat64(value: number, littleEndian: boolean = true): void {
         this.assertBufferSize(8);
 
         this.dataview.setFloat64(this.offset, value, littleEndian);
         this.offset += 8;
     }
     
-    public writeBoolean(value: boolean): void {
+    protected writeBoolean(value: boolean): void {
         this.assertBufferSize(1);
 
         this.dataview.setUint8(this.offset, value ? 1 : 0);
         this.offset++;
     }
 
-    public writeBuffer(value: Buffer): void 
+    protected writeBuffer(value: Buffer): void 
     {
         this.assertBufferSize(value.byteLength + 4);
 
@@ -76,7 +76,7 @@ export default class BufferWriter {
         }
     }
 
-    public writeString(value: string): void {
+    protected writeString(value: string): void {
         const encoder = new TextEncoder();
         const encoded = encoder.encode(value);
 
