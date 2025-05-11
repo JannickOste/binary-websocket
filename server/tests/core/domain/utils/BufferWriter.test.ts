@@ -173,7 +173,7 @@ describe("BufferWriter", () => {
             const writer = new TestBufferWriter(buffer);
     
             writer.writeBoolean(true);
-            expect(buffer[0]).toBe(1); // true should be written as 1
+            expect(buffer[0]).toBe(1);
         });
     
         test("Writes correct value for false", () => {
@@ -181,7 +181,7 @@ describe("BufferWriter", () => {
             const writer = new TestBufferWriter(buffer);
     
             writer.writeBoolean(false);
-            expect(buffer[0]).toBe(0); // false should be written as 0
+            expect(buffer[0]).toBe(0);
         });
     
         test("Increments current offset after writing a boolean", () => {
