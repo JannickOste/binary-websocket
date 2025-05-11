@@ -1,8 +1,9 @@
 export default class BufferReader 
 {
     private readonly dataview: DataView;
+
     public get buffer(): Buffer {
-        return Buffer.from(this.dataview.buffer);
+        return Buffer.from(this.dataview.buffer.slice(this.dataview.byteOffset, this.dataview.byteOffset + this.dataview.byteLength));
     }
 
     private offset: number = 0;
@@ -11,8 +12,9 @@ export default class BufferReader
     constructor(
         buffer: Buffer
     ) {
-        this.dataview = new DataView(Buffer.from(buffer).buffer);
+        this.dataview = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
     }
+    
 
 
     protected readByte(): number 
@@ -54,7 +56,7 @@ export default class BufferReader
     protected readBuffer(): Buffer
     {
         const length = this.readInt();
-        console.dir(length)
+
         const buffer = new Uint8Array(length)
         for(let index = 0; index < length; index++)
         {
