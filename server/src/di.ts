@@ -8,6 +8,9 @@ const types = {
         Domain: {
         },
         Infrastructure: {
+            Crypt: {
+                IRSAInterface: Symbol.for("Core/Infrastructure/Crypt/IRSInterface")
+            }
         },
         Presentation: {}
     }
