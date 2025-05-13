@@ -1,21 +1,25 @@
-import EncryptionType from "../../../domain/crypt/EncryptionType";
-import Client from "../../../domain/socket/Client";
-import OutgoingPacketBuilderInterface from "../../../domain/socket/OutgoingPacketBuilderInterface";
-import ServerPacket from "../../../domain/socket/ServerPacket";
-import SocketPacket from "../../../domain/socket/SocketPacket";
+import { bindingScopeValues, inject, LazyServiceIdentifier } from "inversify";
+import OutgoingPacketManagerInterface from "../../../domain/socket/manager/OutgoingPacketManagerInterface";
+import IncommingPacketProcessorInterface from "../../../domain/socket/IncommingPacketProcessorInterface";
+import RSAInterface from "../../../domain/crypt/RSAInterface";
+import { provide } from "../../../domain/decorators/provide";
+import ClientPacket from "../../../domain/socket/ClientPacket";
+import BufferReader from "../../../domain/utils/BufferReader";
+import types from "../../../../di";
+import OutgoingPacketManager from "../../../infrastructure/socket/manager/OutgoingPacketManager";
 
-export default class SendRSAKey extends SocketPacket implements OutgoingPacketBuilderInterface
-{
-    constructor(){
-        super(
-            ServerPacket.SendRSAKey, 
-            EncryptionType.NONE
-        );
+@provide(types.Core.Infrastructure.Socket.IncommingPacketProcessorInterface, bindingScopeValues.Singleton)
+export default class SendRSAKey implements IncommingPacketProcessorInterface {
+    id = ClientPacket.SendRSAKey;
+    constructor(
+        @inject(types.Core.Infrastructure.Crypt.IRSAInterface)
+        private readonly rsa: RSAInterface,
+    ) {
     }
 
-    async build(client: Client, ...data: unknown[]): Promise<SocketPacket> {
+    async process(packetReader: BufferReader): Promise<void> {
+        this.rsa.publicServerKey = packetReader.readString();
         
-        return this;
+        OutgoingPacketManager.Singleton.dispatchToServer(ClientPacket.SendRSAKey)
     }
-    
 }
