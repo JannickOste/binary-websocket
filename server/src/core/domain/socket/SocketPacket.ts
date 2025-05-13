@@ -8,8 +8,8 @@ export default class SocketPacket extends BufferWriter
     public static readonly MAX_PAYLOAD_SIZE = SocketPacket.MAX_PACKET_SIZE - SocketPacket.HEADER_SIZE;
 
     constructor(
-        id: number,
-        encryption: EncryptionType,
+        private readonly id: number,
+        private readonly encryption: EncryptionType,
     ) {
         super(Buffer.alloc(SocketPacket.MAX_PACKET_SIZE));
 
