@@ -46,14 +46,14 @@ export default class BufferReader
         return value;
     }
 
-    protected readBoolean(): boolean {
+    public readBoolean(): boolean {
         const value = this.dataview.getUint8(this.offset);
         this.offset++;
 
         return value === 1;
     }
 
-    protected readBuffer(): Buffer
+    public readBuffer(): Buffer
     {
         const length = this.readInt();
 
@@ -67,13 +67,18 @@ export default class BufferReader
         return Buffer.from(buffer);
     }
 
-    protected readString(): string {
+    public readString(): string {
         const decoder = new TextDecoder();
         
         return decoder.decode(this.readBuffer());
     }
 
-    public read<T>(type: { new(...args: any[]): T } | Function): T {
+    public readNumber(): number {
+        return this.readFloat32();
+    }
+
+    public read<T>(type?: { new(...args: any[]): T } | Function): T {
+        const resolvedType = type ?? Number;
         if (type === Number) return this.readFloat32() as T;
         if (type === String) return this.readString() as T;
         if (type === Boolean) return this.readBoolean() as T;
