@@ -2,6 +2,7 @@ import { WebSocket } from "ws";
 import AES from "../../infrastructure/crypt/AES";
 import AESInterface from "../crypt/AESInterface";
 import types, { container } from "../../../di";
+import crypto from "crypto"
 
 export default class Client 
 {
@@ -31,6 +32,12 @@ export default class Client
 
     public set aesKey(value: Buffer) {
         this._aesKey = value;
+    }
+
+    private _confirmationCode: Buffer = crypto.randomBytes(32);
+    public get confirmationCode(): Buffer
+    {
+        return this._confirmationCode;
     }
 
     public readonly aes: AESInterface;
