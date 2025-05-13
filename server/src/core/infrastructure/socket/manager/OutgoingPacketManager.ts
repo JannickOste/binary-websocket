@@ -8,12 +8,18 @@ import AES from "../../crypt/AES";
 import RSA from "../../crypt/RSA";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
 import WebSocketServer from "../WebSocketServer";
-import types from "../../../../di";
+import types, { container } from "../../../../di";
 import { provide } from "../../../domain/decorators/provide";
 
 @provide(types.Core.Infrastructure.Socket.Manager.OutgoingPacketManager, bindingScopeValues.Singleton)
 export default class OutgoingPacketManager implements OutgoingPacketManagerInterface {
     private readonly serverPacketHandlerMap: Map<ServerPacket, OutgoingPacketBuilderInterface> = new Map();
+    
+    // Needs better solution, temp fix for circulair dependency when wanting to inject in IncommingPackets to dispatch outgoing.
+    public static get Singleton(): OutgoingPacketManagerInterface 
+    {
+        return container.get<OutgoingPacketManagerInterface>(types.Core.Infrastructure.Socket.Manager.OutgoingPacketManager)
+    }
 
     constructor(
         @multiInject(types.Core.Infrastructure.Socket.OutgoingPacketBuilderInterface) packetBuilders: OutgoingPacketBuilderInterface[],
