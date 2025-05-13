@@ -61,7 +61,7 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
                 packet = encryptedPacket;
             }
 
-            return client.socket.send(packet.buffer);
+            return client.socket.send(packet.buffer.subarray(0, packet.currentOffset));
         } 
         
         console.log(`Packet handler with id: ${id} not found`)

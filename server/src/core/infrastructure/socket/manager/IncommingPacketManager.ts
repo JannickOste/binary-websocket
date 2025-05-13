@@ -36,6 +36,7 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
         const id = packetReader.readInt()
         const encryption = packetReader.readString();
 
+        console.log(`Packet received with id: ${id}, encryption: ${encryption}`)   
         if(encryption !== EncryptionType.NONE)
         {
             if(AES.ALLOWED_MODES.includes(encryption))
@@ -54,8 +55,7 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
                 packetReader = new BufferReader(this.rsa.decrypt(data))
             }
         }
-        
-        console.log(`Packet received with id: ${id}, encryption: ${encryption}`)    
+         
         const packetHandler = this.clientPacketHandlerMap.get(id);
         if (packetHandler) {
             packetHandler.process(client, packetReader);
