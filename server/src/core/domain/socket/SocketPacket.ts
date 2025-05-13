@@ -8,12 +8,12 @@ export default class SocketPacket extends BufferWriter
     public static readonly MAX_PAYLOAD_SIZE = SocketPacket.MAX_PACKET_SIZE - SocketPacket.HEADER_SIZE;
 
     constructor(
-        private readonly id: number,
-        private readonly encryption: EncryptionType,
+        public readonly id: number,
+        public readonly encryption: EncryptionType,
     ) {
         super(Buffer.alloc(SocketPacket.MAX_PACKET_SIZE));
 
         this.writeInt(id);
-        this.writeByte(encryption);
+        this.writeString(encryption);
     }
 }
