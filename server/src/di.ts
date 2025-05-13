@@ -20,7 +20,7 @@ const types = {
                 OutgoingPacketBuilderInterface: Symbol.for("Core/Domain/Socket/OutgoingPacketBuilderInterface"),
                 IncommingPacketProcessorInterface: Symbol.for("Core/Domain/Socket/IncommingPacketProcessorInterface"),
                 WebSocketServer: Symbol.for("Core/Domain/Socket/WebSocketServer")
-            }
+            },
         },
         Presentation: {}
     }
