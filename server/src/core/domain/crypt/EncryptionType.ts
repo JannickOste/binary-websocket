@@ -1,5 +1,5 @@
 enum EncryptionType {
-    NONE = 'NONE',
+    NONE = 'none',
     AES256GCM = "aes-256-gcm",
     AES256CBC = "aes-256-cbc",
     AES256ECB = "aes-256-cbc",

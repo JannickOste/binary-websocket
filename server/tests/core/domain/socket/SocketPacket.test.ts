@@ -4,12 +4,15 @@ import SocketPacket from "../../../../src/core/domain/socket/SocketPacket";
 describe("SocketPacket", () => {    
     describe("constructor", () => {
         it("should set the id and encryption type correctly", () => {
-            const packet = new SocketPacket(1, 1);
+            const packet = new SocketPacket(1, EncryptionType.NONE);
             const header = packet.buffer.subarray(0, SocketPacket.HEADER_SIZE);
-            const oneBuffer = Buffer.from([1, 0, 0, 0]);
-            
-            expect(header.subarray(0, 4).equals(oneBuffer)).toBe(true);
-            expect(header.subarray(4, 8).equals(oneBuffer)).toBe(true);
+
+            const expectedHeader = Buffer.alloc(8);
+            expectedHeader.writeUInt32LE(1, 0);
+            expectedHeader.writeUInt32LE(4, 4);
+            expectedHeader.write("none", 8);
+
+            expect(header.equals(expectedHeader)).toBe(true);
         });
     });
 });
