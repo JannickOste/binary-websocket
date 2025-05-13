@@ -34,7 +34,7 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
         data: Buffer
     ) {
         let packetReader = new BufferReader(data);
-        const id = packetReader.readNumber()
+        const id = packetReader.readInt()
         const encryption = packetReader.readString();
 
         if(encryption !== EncryptionType.NONE)
