@@ -46,7 +46,7 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
             {
                 const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
 
-                const cypherData = this.aes.encrypt(body, this.aes.key);
+                const cypherData = this.aes.encrypt(body, this.aes.serverKey);
                 encryptedPacket.write(cypherData.iv);
                 encryptedPacket.write(cypherData.data);
 
