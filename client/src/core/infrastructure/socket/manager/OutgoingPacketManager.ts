@@ -41,7 +41,7 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
                 data
             );
 
-            const body = packet.buffer.subarray(SocketPacket.HEADER_SIZE, packet.currentOffset)
+            const body = packet.buffer.subarray(packet.headerSize, packet.currentOffset)
             if(AES.ALLOWED_MODES.includes(packet.encryption))
             {
                 const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
@@ -61,7 +61,7 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
                 packet = encryptedPacket;
             }
 
-            return this.client.socket.send(packet.buffer);
+            return this.client.socket.send(packet.buffer.subarray(0, packet.currentOffset));
         } 
         
         console.log(`Packet handler with id: ${id} not found`)

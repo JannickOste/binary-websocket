@@ -7,7 +7,7 @@ import { unmanaged } from "inversify";
 
 @provide(types.Core.Infrastructure.Crypt.IRSAInterface, bindingScopeValues.Singleton)
 export default class RSA implements RSAInterface {
-    private readonly keyPair: forge.pki.rsa.KeyPair = forge.pki.rsa.generateKeyPair(4096);
+    private readonly keyPair: forge.pki.rsa.KeyPair = forge.pki.rsa.generateKeyPair(2048);
 
     public static readonly ALLOWED_MODES = ["RSA-OAEP", "RSAES-PKCS1-V1_5"]
     private _publicServerKey: string | undefined;
@@ -20,7 +20,7 @@ export default class RSA implements RSAInterface {
 
         return this._publicServerKey;
     }    
-    
+
     public set publicServerKey(value: string) 
     {
         this._publicServerKey = value;
