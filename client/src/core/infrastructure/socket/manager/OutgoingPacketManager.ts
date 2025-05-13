@@ -7,21 +7,28 @@ import SocketPacket from "../../../domain/socket/SocketPacket";
 import AES from "../../crypt/AES";
 import RSA from "../../crypt/RSA";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
-import types from "../../../../di";
+import types, { container } from "../../../../di";
 import { provide } from "../../../domain/decorators/provide";
 import ClientPacket from "../../../domain/socket/ClientPacket";
 import AESInterface from "../../../domain/crypt/AESInterface";
 import WebSocketClient from "../WebSocketClient";
+import WebSocketClientInterface from "../../../domain/socket/WebSocketClientInterface";
 
 @provide(types.Core.Infrastructure.Socket.Manager.OutgoingPacketManager, bindingScopeValues.Singleton)
 export default class OutgoingPacketManager implements OutgoingPacketManagerInterface {
     private readonly outgoingPacketBuilderMap: Map<ClientPacket, OutgoingPacketBuilderInterface> = new Map();
 
+    // Needs better solution, temp fix for circulair dependency when wanting to inject in IncommingPackets to dispatch outgoing.
+    public static get Singleton(): OutgoingPacketManagerInterface 
+    {
+        return container.get<OutgoingPacketManagerInterface>(types.Core.Infrastructure.Socket.Manager.OutgoingPacketManager)
+    }
+
     constructor(
         @multiInject(types.Core.Infrastructure.Socket.OutgoingPacketBuilderInterface) packetBuilders: OutgoingPacketBuilderInterface[],
         @inject(types.Core.Infrastructure.Crypt.IRSAInterface) private readonly rsa: RSAInterface,
         @inject(types.Core.Infrastructure.Crypt.IAESInterface) private readonly aes: AESInterface,
-        @inject(types.Core.Infrastructure.Socket.WebSocketClient) private readonly client: WebSocketClient
+        @inject(types.Core.Infrastructure.Socket.WebSocketClient) private readonly client: WebSocketClientInterface
     ) {
         packetBuilders.forEach(handler => this.outgoingPacketBuilderMap.set(handler.id, handler));
     }

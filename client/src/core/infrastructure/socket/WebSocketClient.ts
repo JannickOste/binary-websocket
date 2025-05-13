@@ -6,9 +6,10 @@ import Client from "../../domain/socket/Client";
 import { unmanaged } from "inversify";
 import { WebSocket } from "ws";
 import BufferReader from "../../domain/utils/BufferReader";
+import WebSocketClientInterface from "../../domain/socket/WebSocketClientInterface";
 
 @provide(types.Core.Infrastructure.Socket.WebSocketClient, bindingScopeValues.Singleton)
-export default class WebSocketClient {
+export default class WebSocketClient implements WebSocketClientInterface {
     private _socket: WebSocket | undefined;
     public get socket(): WebSocket 
     {
