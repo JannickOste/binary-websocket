@@ -9,6 +9,8 @@ import { unmanaged } from "inversify";
 export default class RSA implements RSAInterface {
     private readonly keyPair: forge.pki.rsa.KeyPair = forge.pki.rsa.generateKeyPair(4096);
 
+    public static readonly ALLOWED_MODES = ["RSA-OAEP", "RSAES-PKCS1-V1_5"]
+
     public get publicKey(): string {
         return forge.pki.publicKeyToRSAPublicKeyPem(this.keyPair.publicKey);
     }

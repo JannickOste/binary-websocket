@@ -10,7 +10,7 @@ class AES implements AESInterface {
     private static readonly KEY_SIZE = 32; 
     private static readonly IV_SIZE = 16;
 
-    private static readonly ALLOWED_MODES = ['aes-256-cbc', 'aes-256-ecb', 'aes-256-gcm'];
+    public static readonly ALLOWED_MODES = ['aes-256-cbc', 'aes-256-ecb', 'aes-256-gcm'];
 
     constructor(
         @unmanaged() public readonly key: Buffer = crypto.randomBytes(AES.KEY_SIZE),
