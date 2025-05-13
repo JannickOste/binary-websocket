@@ -5,18 +5,14 @@ import Client from "../../../domain/socket/Client";
 import ClientPacket from "../../../domain/socket/ClientPacket";
 import IncommingPacketProcessorInterface from "../../../domain/socket/IncommingPacketProcessorInterface";
 import BufferReader from "../../../domain/utils/BufferReader";
-import OutgoingPacketManager from "../../../infrastructure/socket/manager/OutgoingPacketManager";
-import ServerPacket from "../../../domain/socket/ServerPacket";
 
 @provide(types.Core.Infrastructure.Socket.IncommingPacketProcessorInterface, bindingScopeValues.Singleton)
-export default class SendRSAKey implements IncommingPacketProcessorInterface {
-    id: number = ClientPacket.SendRSAKey;
+export default class SendAESKey implements IncommingPacketProcessorInterface {
+    id: number = ClientPacket.SendAESKey;
 
     async process(client: Client, packetReader: BufferReader): Promise<void> {
-        const key = packetReader.readString();
+        const key = packetReader.readBuffer();
 
-        client.rsaKey = key; 
-
-        return await OutgoingPacketManager.Singleton.dispatchToClient(client, ServerPacket.SendAESKey);
+        client.aesKey = key; 
     }
 }
