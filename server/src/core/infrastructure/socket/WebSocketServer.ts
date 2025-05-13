@@ -42,10 +42,15 @@ export default class WebSocketServer  {
         const client = WebSocketServer.clients.get(socket);
         if(client)
         {
-            await this.incommingPacketManager.processPacket(
-                client, 
-                data as Buffer
-            )
+            if(data instanceof ArrayBuffer)
+            {
+                return await this.incommingPacketManager.processPacket(
+                    client, 
+                    Buffer.from(data)
+                )
+            }
+
+
         }
     }
 
