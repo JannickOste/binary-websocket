@@ -17,7 +17,7 @@ export default class BufferReader
     
 
 
-    protected readByte(): number 
+    public readByte(): number 
     {
         const value = this.dataview.getInt8(this.offset);
         this.offset++;
@@ -25,21 +25,21 @@ export default class BufferReader
         return value;
     }
 
-    protected readShort(littleEndian: boolean = true): number {
+    public readShort(littleEndian: boolean = true): number {
         const value = this.dataview.getInt16(this.offset, littleEndian);
         this.offset += 2; 
 
         return value;
     }
 
-    protected readInt(littleEndian: boolean = true): number {
+    public readInt(littleEndian: boolean = true): number {
         const value = this.dataview.getInt32(this.offset, littleEndian);
         this.offset += 4; 
         
         return value;
     }
 
-    protected readFloat32(littleEndian: boolean = true): number {
+    public readFloat32(littleEndian: boolean = true): number {
         const value = this.dataview.getFloat32(this.offset, littleEndian);
         this.offset += 4;
 
@@ -73,8 +73,8 @@ export default class BufferReader
         return decoder.decode(this.readBuffer());
     }
 
-    public readNumber(): number {
-        return this.readFloat32();
+    public readNumber(littleEndian: boolean = true): number {
+        return this.readFloat32(littleEndian);
     }
 
     public read<T>(type?: { new(...args: any[]): T } | Function): T {

@@ -9,23 +9,24 @@ import BufferReader from "../../../domain/utils/BufferReader";
 import types from "../../../../di";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
 import { provide } from "../../../domain/decorators/provide";
+import AESInterface from "../../../domain/crypt/AESInterface";
 
 @provide(types.Core.Infrastructure.Socket.OutgoingPacketBuilderInterface, bindingScopeValues.Singleton)
-export default class SendRSAKey extends SocketPacket implements OutgoingPacketBuilderInterface {
-    id: number = ClientPacket.SendRSAKey;
+export default class SendAESKey extends SocketPacket implements OutgoingPacketBuilderInterface {
+    id: number = ClientPacket.SendAESKey;
 
     constructor(
-        @inject(types.Core.Infrastructure.Crypt.IRSAInterface) private readonly rsa: RSAInterface
+        @inject(types.Core.Infrastructure.Crypt.IAESInterface) private readonly aes: AESInterface
     )
     {
         super(
-            ClientPacket.SendRSAKey,
-            EncryptionType.NONE
+            ClientPacket.SendAESKey,
+            EncryptionType.RSAOAEP
         );
     }
 
     async build(...data: unknown[]): Promise<SocketPacket> {
-        this.writeString(this.rsa.publicKey);
+        this.writeBuffer(this.aes.key);
 
         return this;
     }
