@@ -19,6 +19,8 @@ export default class SendAESKey implements IncommingPacketProcessorInterface {
     }
 
     async process(packetReader: BufferReader): Promise<void> {
+        console.dir(packetReader.buffer.byteLength)
+
         this.aes.serverKey = packetReader.readBuffer();
         
         return await OutgoingPacketManager.Singleton.dispatchToServer(ClientPacket.SendAESKey)

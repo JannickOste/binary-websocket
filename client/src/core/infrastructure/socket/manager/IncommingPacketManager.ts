@@ -41,6 +41,7 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
         {
             if(AES.ALLOWED_MODES.includes(encryption))
             {
+                console.log("Decrypting RSA Packet")
                 const iv = packetReader.readBuffer();
                 const data = packetReader.readBuffer();
                 const tag = encryption === EncryptionType.AES256GCM ? packetReader.readBuffer() : undefined;
@@ -50,9 +51,14 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
 
             if(RSA.ALLOWED_MODES.includes(encryption))
             {
+                console.log("Decrypting RSA Packet")
                 const data = packetReader.readBuffer();
+                console.dir(packetReader.buffer)
+                const decryptedData = this.rsa.decrypt(data);
 
-                packetReader = new BufferReader(this.rsa.decrypt(data))
+                console.log(`${data.byteLength} => ${decryptedData.byteLength}`)
+
+                packetReader = new BufferReader(decryptedData)
             }
         }
         
