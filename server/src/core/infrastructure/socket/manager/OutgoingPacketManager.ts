@@ -37,7 +37,7 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
                 data
             );
 
-            const body = packet.buffer.subarray(SocketPacket.HEADER_SIZE, packet.currentOffset)
+            const body = packet.buffer.subarray(packet.headerSize, packet.currentOffset)
             if(AES.ALLOWED_MODES.includes(packet.encryption))
             {
                 const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
@@ -52,8 +52,12 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
             if(RSA.ALLOWED_MODES.includes(packet.encryption))
             {
                 const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
-                encryptedPacket.write(this.rsa.encrypt(body, client.rsaKey))
+                const encryptedData = this.rsa.encrypt(body, client.rsaKey);
+                encryptedPacket.write(encryptedData);
 
+
+                console.log(`Original length: ${body.byteLength} to ${encryptedData.byteLength}`)
+                console.log(`Packet size original: ${packet.currentOffset} to ${encryptedPacket.currentOffset}`)
                 packet = encryptedPacket;
             }
 
