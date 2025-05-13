@@ -9,7 +9,8 @@ const types = {
         },
         Infrastructure: {
             Crypt: {
-                IRSAInterface: Symbol.for("Core/Infrastructure/Crypt/IRSInterface")
+                IRSAInterface: Symbol.for("Core/Infrastructure/Crypt/IRSInterface"),
+                IAESInterface: Symbol.for("Core/Infrastructure/Crypt/IAESInterface"),
             }
         },
         Presentation: {}
