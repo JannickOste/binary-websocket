@@ -5,6 +5,8 @@ import Client from "../../../domain/socket/Client";
 import ClientPacket from "../../../domain/socket/ClientPacket";
 import IncommingPacketProcessorInterface from "../../../domain/socket/IncommingPacketProcessorInterface";
 import BufferReader from "../../../domain/utils/BufferReader";
+import OutgoingPacketManager from "../../../infrastructure/socket/manager/OutgoingPacketManager";
+import ServerPacket from "../../../domain/socket/ServerPacket";
 
 @provide(types.Core.Infrastructure.Socket.IncommingPacketProcessorInterface, bindingScopeValues.Singleton)
 export default class SendAESKey implements IncommingPacketProcessorInterface {
@@ -14,5 +16,7 @@ export default class SendAESKey implements IncommingPacketProcessorInterface {
         const key = packetReader.readBuffer();
 
         client.aesKey = key; 
+        
+        return await OutgoingPacketManager.Singleton.dispatchToClient(client, ServerPacket.SendConfirmation);
     }
 }
