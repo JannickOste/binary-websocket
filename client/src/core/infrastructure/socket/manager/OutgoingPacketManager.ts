@@ -38,7 +38,7 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
         if(packetHandler)
         {
             let packet = await packetHandler.build(
-                data
+                ... data
             );
 
             const body = packet.buffer.subarray(packet.headerSize, packet.currentOffset)
