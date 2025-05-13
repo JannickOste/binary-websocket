@@ -37,7 +37,7 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
                 data
             );
 
-            const body = packet.buffer.subarray(SocketPacket.HEADER_SIZE)
+            const body = packet.buffer.subarray(SocketPacket.HEADER_SIZE, packet.currentOffset)
             if(AES.ALLOWED_MODES.includes(packet.encryption))
             {
                 const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
