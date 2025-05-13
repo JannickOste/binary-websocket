@@ -11,6 +11,15 @@ const types = {
             Crypt: {
                 IRSAInterface: Symbol.for("Core/Infrastructure/Crypt/IRSInterface"),
                 IAESInterface: Symbol.for("Core/Infrastructure/Crypt/IAESInterface"),
+            },
+            Socket: {
+                Manager: { 
+                    IncommingPacketManager: Symbol.for("Core/Domain/Socket/Manager/IncommingPacketManager"),
+                    OutgoingPacketManager: Symbol.for("Core/Domain/Socket/Manager/OutgoingPacketManager"),
+                },
+                OutgoingPacketBuilderInterface: Symbol.for("Core/Domain/Socket/OutgoingPacketBuilderInterface"),
+                IncommingPacketProcessorInterface: Symbol.for("Core/Domain/Socket/IncommingPacketProcessorInterface"),
+                WebSocketServer: Symbol.for("Core/Domain/Socket/WebSocketServer")
             }
         },
         Presentation: {}
