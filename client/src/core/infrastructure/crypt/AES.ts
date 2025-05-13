@@ -5,12 +5,27 @@ import AESCypherData from "../../domain/crypt/AESCypherData";
 import { provide } from "../../domain/decorators/provide";
 import types from "../../../di";
 
-@provide(types.Core.Infrastructure.Crypt.IAESInterface, bindingScopeValues.Request)
+@provide(types.Core.Infrastructure.Crypt.IAESInterface, bindingScopeValues.Singleton)
 class AES implements AESInterface {
     private static readonly KEY_SIZE = 32; 
     private static readonly IV_SIZE = 16;
 
     public static readonly ALLOWED_MODES = ['aes-256-cbc', 'aes-256-ecb', 'aes-256-gcm'];
+    public _serverKey: Buffer<ArrayBufferLike> | undefined;
+    public get serverKey(): Buffer 
+    {
+        if(!this._serverKey)
+        {
+            throw new Error("No server key set");
+        }
+
+        return this._serverKey;
+    }
+
+    public set serverKey(value: Buffer) 
+    {
+        this._serverKey = value;
+    }
 
     constructor(
         @unmanaged() public readonly key: Buffer = crypto.randomBytes(AES.KEY_SIZE),

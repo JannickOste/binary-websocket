@@ -12,6 +12,7 @@ import BufferReader from "../../../domain/utils/BufferReader";
 import AES from "../../crypt/AES";
 import RSA from "../../crypt/RSA";
 import { provide } from "../../../domain/decorators/provide";
+import AESInterface from "../../../domain/crypt/AESInterface";
 
 @provide(types.Core.Infrastructure.Socket.Manager.IncommingPacketManager, bindingScopeValues.Singleton)
 export default class IncommingPacketManager implements IncommingPacketManagerInterface
@@ -21,7 +22,8 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
 
     constructor(
         @multiInject(types.Core.Infrastructure.Socket.IncommingPacketProcessorInterface) private readonly packetProcessors: IncommingPacketProcessorInterface[],
-        @inject(types.Core.Infrastructure.Crypt.IRSAInterface) private readonly rsa: RSAInterface
+        @inject(types.Core.Infrastructure.Crypt.IRSAInterface) private readonly rsa: RSAInterface,
+        @inject(types.Core.Infrastructure.Crypt.IAESInterface) private readonly aes: AESInterface,
     ) {
         this.packetProcessors.forEach(handler => this.clientPacketHandlerMap.set(handler.id, handler));
 
@@ -29,7 +31,6 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
 
 
     public async processPacket(
-        client: Client,
         data: Buffer
     ) {
         let packetReader = new BufferReader(data);
@@ -44,7 +45,7 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
                 const data = packetReader.readBuffer();
                 const tag = encryption === EncryptionType.AES256GCM ? packetReader.readBuffer() : undefined;
 
-                packetReader = new BufferReader(client.aes.decrypt(data, iv, tag));
+                packetReader = new BufferReader(this.aes.decrypt(data, iv, tag));
             }
 
             if(RSA.ALLOWED_MODES.includes(encryption))
@@ -58,10 +59,10 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
         console.log(`Packet received with id: ${id}, encryption: ${encryption}`)    
         const packetHandler = this.clientPacketHandlerMap.get(id);
         if (packetHandler) {
-            packetHandler.process(client, packetReader);
+            packetHandler.process( packetReader);
             return;
         } 
 
-        client.socket.close();
+        console.log("Failed to parse packet.");
     }
 }

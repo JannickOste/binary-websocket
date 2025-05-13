@@ -1,7 +1,5 @@
-import Client from "../Client";
-import ServerPacket from "../ServerPacket";
+import ClientPacket from "../ClientPacket";
 
 export default interface OutgoingPacketManagerInterface {
-    dispatchToClient(client: Client, id: ServerPacket, ...data: unknown[]): Promise<void>;
-    dispatchToAll(id: ServerPacket, ...data: unknown[]): Promise<void>;
+    dispatchToServer(id: ClientPacket, ...data: unknown[]): Promise<void>;
 }

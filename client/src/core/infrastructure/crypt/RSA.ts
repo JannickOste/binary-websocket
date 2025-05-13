@@ -10,7 +10,23 @@ export default class RSA implements RSAInterface {
     private readonly keyPair: forge.pki.rsa.KeyPair = forge.pki.rsa.generateKeyPair(4096);
 
     public static readonly ALLOWED_MODES = ["RSA-OAEP", "RSAES-PKCS1-V1_5"]
+    private _publicServerKey: string | undefined;
+    public get publicServerKey(): string 
+    {
+        if(!this._publicServerKey)
+        {
+            throw new Error("No server RSA key set.");
+        }
 
+        return this._publicServerKey;
+    }    
+    
+    public set publicServerKey(value: string) 
+    {
+        this._publicServerKey = value;
+    }
+
+    
     public get publicKey(): string {
         return forge.pki.publicKeyToRSAPublicKeyPem(this.keyPair.publicKey);
     }

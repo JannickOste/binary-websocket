@@ -19,10 +19,14 @@ const types = {
                 },
                 OutgoingPacketBuilderInterface: Symbol.for("Core/Domain/Socket/OutgoingPacketBuilderInterface"),
                 IncommingPacketProcessorInterface: Symbol.for("Core/Domain/Socket/IncommingPacketProcessorInterface"),
-                WebSocketServer: Symbol.for("Core/Domain/Socket/WebSocketServer")
+                WebSocketClient: Symbol.for("Core/Domain/Socket/WebSocketClient")
             },
         },
         Presentation: {}
+    },
+    Crypt: {
+        SeverAESKey: Symbol.for("Crypt/ServerAESKey"),
+        SeverRSAKey: Symbol.for("Crypt/ServerAESKey"),
     }
 }
 

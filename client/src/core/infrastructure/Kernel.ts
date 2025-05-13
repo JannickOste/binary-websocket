@@ -1,6 +1,6 @@
 import { globSync } from "glob"
 import types, { container } from "../../di";
-import WebSocketServer from "./socket/WebSocketServer";
+import WebSocketClient from "./socket/WebSocketClient";
 
 export default class Kernel 
 {
@@ -15,14 +15,10 @@ export default class Kernel
 
     public async start(): Promise<void> 
     {
-        const server = container.get<WebSocketServer>(types.Core.Infrastructure.Socket.WebSocketServer)
-        if(server)
+        const client = container.get<WebSocketClient>(types.Core.Infrastructure.Socket.WebSocketClient)
+        if(client)
         {
-            console.log("Starting server...");  
-
-            await server.listen();
-            
-            console.log("Server started!");
+            await client.connect();
         }
     }
 }
