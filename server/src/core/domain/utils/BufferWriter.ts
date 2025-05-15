@@ -5,10 +5,8 @@ export default class BufferWriter {
     }
 
     constructor(
-        public readonly buffer: Buffer,
-        adjustOffset: boolean = false
+        public readonly buffer: Buffer
     ) {
-        if(adjustOffset) this.offset = buffer.byteLength;
     }
 
     protected assertWithinBufferRange(size: number): void { 
@@ -16,24 +14,21 @@ export default class BufferWriter {
             throw new Error("BufferOverflow: Not enough space in buffer to write data");
         }
     }
-
-    public writeByte(byte: number): void 
-    {
+    public writeByte(byte: number): void {
         this.assertWithinBufferRange(1);
-        
-        this.buffer.writeInt8(byte)
+
+        this.buffer.writeInt8(byte, this.offset);
 
         this.offset++;
     }
-
-    public writeUByte(byte: number): void 
-    {
+    
+    public writeUByte(byte: number): void {
         this.assertWithinBufferRange(1);
 
-        this.buffer.writeUint8(byte)
+        this.buffer.writeUint8(byte, this.offset);
+
         this.offset++;
     }
-
     public writeBoolean(value: boolean): void {
         this.writeByte(Number(value))
     }
@@ -119,13 +114,4 @@ export default class BufferWriter {
         this.writeBuffer(encoded)
     }
 
-    public write<T>(value: T, littleEndian: boolean = true): void {
-        if (typeof value === "number") return this.writeFloat(value, littleEndian);
-        if (typeof value === "boolean") return this.writeBoolean(value);
-        if (typeof value === "string") return this.writeString(value);
-        if (value instanceof Date) return this.writeDate(value);
-        if (value instanceof Buffer || value instanceof Uint8Array) return this.writeBuffer(Buffer.from(value));
-    
-        throw new Error(`Unsupported type for writing: ${typeof value}`);
-    }
 }
