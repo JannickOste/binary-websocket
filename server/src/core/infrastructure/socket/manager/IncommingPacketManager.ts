@@ -9,6 +9,7 @@ import BufferReader from "../../../domain/utils/BufferReader";
 import AES from "../../crypt/AES";
 import RSA from "../../crypt/RSA";
 import { provide } from "../../../domain/decorators/provide";
+import IncommingPacketServiceInterface from "../../../domain/socket/services/IncommingPacketServiceInterface";
 
 @provide(types.Core.Infrastructure.Socket.Manager.IncommingPacketManager, bindingScopeValues.Singleton)
 export default class IncommingPacketManager implements IncommingPacketManagerInterface
@@ -18,7 +19,7 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
 
     constructor(
         @multiInject(types.Core.Infrastructure.Socket.IncommingPacketProcessorInterface) private readonly packetProcessors: IncommingPacketProcessorInterface[],
-        @inject(types.Core.Infrastructure.Crypt.IRSAInterface) private readonly rsa: RSAInterface
+        @inject(types.Core.Infrastructure.Socket.Services.IncommingSocketPacketService) private readonly incommingPacketService: IncommingPacketServiceInterface
     ) {
         this.packetProcessors.forEach(handler => this.clientPacketHandlerMap.set(handler.id, handler));
 
@@ -29,42 +30,10 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
         client: Client,
         data: Buffer
     ) {
-        let packetReader = new BufferReader(data);
-        const headerSize = packetReader.readInt()
-        const id = packetReader.readInt()
-        const encryption = packetReader.readString()
-        if(!Object.values(EncryptionType).includes(encryption as EncryptionType))
-        {
-            client.socket.terminate();
-            throw new Error("Invalid encryption type received")
-        }
-
-
-
-        console.log(`Packet received with id: ${id}, encryption: ${encryption}`)   
-        const encryptionType: EncryptionType = encryption as EncryptionType;
-        if(encryptionType !== EncryptionType.NONE)
-        {
-            if(AES.ALLOWED_MODES.includes(encryption))
-            {
-                const iv = packetReader.readBuffer();
-                const data = packetReader.readBuffer();
-                const tag = encryption === EncryptionType.AES256GCM ? packetReader.readBuffer() : undefined;
-
-                packetReader = new BufferReader(client.aes.decrypt(data, iv, encryptionType, tag));
-            }
-
-            if(RSA.ALLOWED_MODES.includes(encryptionType))
-            {
-                const data = packetReader.readBuffer();
-
-                packetReader = new BufferReader(this.rsa.decrypt(data))
-            }
-        }
-         
-        const packetHandler = this.clientPacketHandlerMap.get(id);
+        const packet = this.incommingPacketService.parsePacket(client, data);
+        const packetHandler = this.clientPacketHandlerMap.get(packet.header.id);
         if (packetHandler) {
-            packetHandler.process(client, packetReader);
+            packetHandler.process(client, new BufferReader(packet.content));
             return;
         } 
 
