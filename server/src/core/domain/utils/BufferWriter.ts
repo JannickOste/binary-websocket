@@ -103,7 +103,7 @@ export default class BufferWriter {
         this.writeInt(value.byteLength);
         for(const byte of value)
         {
-            this.writeByte(byte);
+            this.writeUByte(byte);
         }
     }
 
