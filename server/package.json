@@ -11,7 +11,8 @@
   "scripts": {
     "start": "node dist",
     "start:dev": "ts-node-dev src",
-    "test": "jest"
+    "test": "jest",
+    "test:verbose": "jest --verbose"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
