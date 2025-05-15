@@ -102,16 +102,16 @@ describe('WebSocketServer', () => {
 
     describe('onPacketReceive', () => {
         it('should call processPacket with Buffer if client exists', async () => {
-            const mockBuffer = Buffer.from([1, 2, 3]);
             const mockClient = new Client(mockSocket, 1);
-
             WebSocketServer.clients.set(mockSocket, mockClient);
-
-            await (wsServer as any).onPacketReceive(mockSocket, mockBuffer);
-
+    
+            const data = new Uint8Array([1, 2, 3]).buffer;
+    
+            await (wsServer as any).onPacketReceive(mockSocket, data);
+    
             expect(mockIncommingPacketManager.processPacket).toHaveBeenCalledWith(
                 mockClient,
-                mockBuffer
+                Buffer.from(data)
             );
         });
 

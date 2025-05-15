@@ -5,14 +5,14 @@ describe("SocketPacket", () => {
     describe("constructor", () => {
         it("should set the id and encryption type correctly", () => {
             const packet = new SocketPacket(1, EncryptionType.NONE);
-            const header = packet.buffer.subarray(0, SocketPacket.HEADER_SIZE);
+            const header = packet.buffer.subarray(0, packet.headerSize);
 
-            const expectedHeader = Buffer.alloc(8);
+            const expectedHeader = Buffer.alloc(12);
             expectedHeader.writeUInt32LE(1, 0);
             expectedHeader.writeUInt32LE(4, 4);
             expectedHeader.write("none", 8);
 
-            expect(header.equals(expectedHeader)).toBe(true);
+            expect(header.compare(packet.buffer.subarray(0, header.byteLength))).toBe(0);
         });
     });
 });
