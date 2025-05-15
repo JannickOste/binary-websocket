@@ -19,8 +19,15 @@ export default class BufferWriter {
     public writeByte(byte: number): void 
     {
         this.assertWithinRange(1);
+        
+        this.buffer.writeInt8(byte)
+    }
 
-        this.buffer[this.offset++] = (byte < 128 ? byte - 256 : byte);
+    public writeUByte(byte: number): void 
+    {
+        this.assertWithinRange(1);
+
+        this.buffer.writeUint8(byte)
     }
 
     public writeBoolean(value: boolean): void {
@@ -101,11 +108,11 @@ export default class BufferWriter {
         }
     }
 
-    public writeString(value: string): void {
-        const encoder = new TextEncoder();
-        const encoded = encoder.encode(value);
+    public writeString(value: string, encoding: BufferEncoding = "utf-8"): void {
 
-        this.writeBuffer(Buffer.from(encoded.buffer))
+        const encoded = Buffer.from(value, encoding)
+
+        this.writeBuffer(encoded)
     }
 
     public write<T>(value: T, littleEndian: boolean = true): void {
