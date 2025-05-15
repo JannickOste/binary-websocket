@@ -50,7 +50,7 @@ export default class WebSocketServer  {
                 )
             }
 
-
+            throw new Error("ServerError: Invalid packet received.");
         }
     }
 
