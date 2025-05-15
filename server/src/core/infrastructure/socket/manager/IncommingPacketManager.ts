@@ -34,10 +34,18 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
     ) {
         let packetReader = new BufferReader(data);
         const id = packetReader.readInt()
-        const encryption = packetReader.readString();
+        const encryption = packetReader.readString()
+        if(!Object.values(EncryptionType).includes(encryption as EncryptionType))
+        {
+            client.socket.terminate();
+            throw new Error("Invalid encryption type received")
+        }
+
+
 
         console.log(`Packet received with id: ${id}, encryption: ${encryption}`)   
-        if(encryption !== EncryptionType.NONE)
+        const encryptionType: EncryptionType = encryption as EncryptionType;
+        if(encryptionType !== EncryptionType.NONE)
         {
             if(AES.ALLOWED_MODES.includes(encryption))
             {
@@ -45,10 +53,10 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
                 const data = packetReader.readBuffer();
                 const tag = encryption === EncryptionType.AES256GCM ? packetReader.readBuffer() : undefined;
 
-                packetReader = new BufferReader(client.aes.decrypt(data, iv, tag));
+                packetReader = new BufferReader(client.aes.decrypt(data, iv, encryptionType, tag));
             }
 
-            if(RSA.ALLOWED_MODES.includes(encryption))
+            if(RSA.ALLOWED_MODES.includes(encryptionType))
             {
                 const data = packetReader.readBuffer();
 

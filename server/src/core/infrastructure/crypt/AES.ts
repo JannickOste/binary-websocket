@@ -4,6 +4,7 @@ import AESInterface from "../../domain/crypt/AESInterface";
 import AESCypherData from "../../domain/crypt/AESCypherData";
 import { provide } from "../../domain/decorators/provide";
 import types from "../../../di";
+import EncryptionType from "../../domain/crypt/EncryptionType";
 
 @provide(types.Core.Infrastructure.Crypt.IAESInterface, bindingScopeValues.Request)
 class AES implements AESInterface {
@@ -13,23 +14,17 @@ class AES implements AESInterface {
     public static readonly ALLOWED_MODES = ['aes-256-cbc', 'aes-256-ecb', 'aes-256-gcm'];
 
     constructor(
-        @unmanaged() public readonly key: Buffer = crypto.randomBytes(AES.KEY_SIZE),
-        @unmanaged() private readonly mode: string = 'aes-256-cbc'
-    ) {
-        if (!AES.ALLOWED_MODES.includes(mode as any)) {
-            throw new Error(`Unsupported AES mode. Supported modes are: ${AES.ALLOWED_MODES.join(', ')}`);
-        }
-        this.mode = mode;
-        
+        @unmanaged() public readonly key: Buffer = crypto.randomBytes(AES.KEY_SIZE)
+    ) {        
         if (this.key.length !== AES.KEY_SIZE) throw new Error(`Key must be ${AES.KEY_SIZE} bytes`);
     }
 
-    encrypt(data: Buffer, key: Buffer): AESCypherData {
+    encrypt(data: Buffer, key: Buffer, mode: EncryptionType = EncryptionType.AES256CBC): AESCypherData {
         const iv = crypto.randomBytes(AES.IV_SIZE); 
         let cipher;
         let encrypted;
         
-        switch (this.mode) {
+        switch (mode) {
             case 'aes-256-cbc':
                 cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
 
@@ -59,11 +54,11 @@ class AES implements AESInterface {
         }
     }
 
-    decrypt(data: Buffer, iv: Buffer, tag?: Buffer): Buffer {
+    decrypt(data: Buffer, iv: Buffer, mode: EncryptionType = EncryptionType.AES256CBC, tag?: Buffer): Buffer {
         let decipher;
         let decrypted;
 
-        switch (this.mode) {
+        switch (mode) {
             case 'aes-256-cbc':
                 decipher = crypto.createDecipheriv("aes-256-cbc", this.key, iv);
 
