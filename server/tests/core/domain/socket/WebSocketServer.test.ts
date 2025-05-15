@@ -1,8 +1,6 @@
 import WebSocket from 'ws';
 import WebSocketServer from '../../../../src/core/infrastructure/socket/WebSocketServer';
 import Client from '../../../../src/core/domain/socket/Client';
-import AES from '../../../../src/core/infrastructure/crypt/AES';
-import RSA from '../../../../src/core/infrastructure/crypt/RSA';
 import types, { container } from '../../../../src/di';
 import ServerPacket from '../../../../src/core/domain/socket/ServerPacket';
 
@@ -14,6 +12,15 @@ const mockOutgoingPacketManager = {
 const mockIncommingPacketManager = {
     processPacket: jest.fn()
 };
+
+jest.mock('ws', () => {
+    const mockServer = {
+        on: jest.fn(),
+    };
+    return {
+        Server: jest.fn(() => mockServer),
+    };
+});
 
 const mockAES = {
     encrypt: jest.fn(),
@@ -115,12 +122,49 @@ describe('WebSocketServer', () => {
             );
         });
 
+        it('should throw an error if invalid data has been received', async () => {
+            const mockClient = new Client(mockSocket, 1);
+            WebSocketServer.clients.set(mockSocket, mockClient);
+        
+            const data = Buffer.from("123");
+        
+            await expect((wsServer as any).onPacketReceive(mockSocket, data))
+                .rejects
+                .toThrow();
+        });
+
         it('should not call processPacket if client is not found', async () => {
             const mockBuffer = Buffer.from([1, 2, 3]);
 
             await (wsServer as any).onPacketReceive(mockSocket, mockBuffer);
 
             expect(mockIncommingPacketManager.processPacket).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('listen', () => {
+        it('should initialize WebSocket.Server with correct config and bind connection handler', async () => {
+            const mockOn = jest.fn();
+            (WebSocket.Server as unknown as jest.Mock).mockImplementation(() => ({
+                on: mockOn,
+            }));
+
+            await wsServer.listen();
+
+            expect(WebSocket.Server).toHaveBeenCalledWith({
+                port: wsServer['PORT'], 
+                maxPayload: 4096, 
+            });
+
+            expect(mockOn).toHaveBeenCalledWith('connection', expect.any(Function));
+        });
+
+        it('should throw an error if WebSocket.Server creation fails', async () => {
+            (WebSocket.Server as unknown as jest.Mock).mockImplementationOnce(() => {
+                throw new Error('Port in use');
+            });
+
+            await expect(wsServer.listen()).rejects.toThrow('Port in use');
         });
     });
 
@@ -132,6 +176,14 @@ describe('WebSocketServer', () => {
             await wsServer.destroy();
         
             expect(closeMock).toHaveBeenCalled();
+        });
+    
+        it('should not attempt to close if no server exists', async () => {
+            (wsServer as any).server = undefined;
+            
+            await wsServer.destroy();
+    
+            expect(WebSocket.Server.prototype.close).not.toHaveBeenCalled();
         });
     });
 });
