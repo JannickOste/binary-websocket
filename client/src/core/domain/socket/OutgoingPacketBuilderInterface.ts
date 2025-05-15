@@ -1,5 +1,5 @@
 import Client from "./Client";
-import SocketPacket from "./SocketPacket";
+import SocketPacket from "./packet/SocketPacket";
 
 interface OutgoingPacketBuilderInterface {
     id: number;

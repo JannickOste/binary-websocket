@@ -1,5 +1,6 @@
-import EncryptionType from "../crypt/EncryptionType";
-import BufferWriter from "../utils/BufferWriter";
+import EncryptionType from "../../crypt/EncryptionType";
+import BufferWriter from "../../utils/BufferWriter";
+
 
 export default class SocketPacket extends BufferWriter 
 {

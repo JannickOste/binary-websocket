@@ -3,7 +3,6 @@ import OutgoingPacketManagerInterface from "../../../domain/socket/manager/Outgo
 import ServerPacket from "../../../domain/socket/ServerPacket";
 import OutgoingPacketBuilderInterface from "../../../domain/socket/OutgoingPacketBuilderInterface";
 import Client from "../../../domain/socket/Client";
-import SocketPacket from "../../../domain/socket/SocketPacket";
 import AES from "../../crypt/AES";
 import RSA from "../../crypt/RSA";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
@@ -13,6 +12,7 @@ import ClientPacket from "../../../domain/socket/ClientPacket";
 import AESInterface from "../../../domain/crypt/AESInterface";
 import WebSocketClient from "../WebSocketClient";
 import WebSocketClientInterface from "../../../domain/socket/WebSocketClientInterface";
+import SocketPacket from "../../../domain/socket/packet/SocketPacket";
 
 @provide(types.Core.Infrastructure.Socket.Manager.OutgoingPacketManager, bindingScopeValues.Singleton)
 export default class OutgoingPacketManager implements OutgoingPacketManagerInterface {
