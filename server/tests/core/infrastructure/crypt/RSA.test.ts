@@ -20,7 +20,7 @@ describe("RSA", () => {
         it("should encrypt with 'RSA-OAEP'", () => {
             const encrypted = rsaService.encrypt(testData, publicKey, EncryptionType.RSAOAEP);
             expect(Buffer.isBuffer(encrypted)).toBe(true);
-            expect(encrypted.equals(testData)).toBe(false); // should not be plaintext
+            expect(encrypted.equals(testData)).toBe(false); 
         });
 
         it("should encrypt with 'RSAES-PKCS1-V1_5'", () => {
