@@ -49,8 +49,8 @@ export default class BufferWriter {
     public writeInt(value: number, littleEndian: boolean = true): void {
         this.assertWithinRange(4);
 
-        if(littleEndian) this.buffer.writeInt16LE(value, this.offset)
-        else this.buffer.writeUint16BE(value, this.offset);
+        if(littleEndian) this.buffer.writeInt32LE(value, this.offset)
+        else this.buffer.writeInt32BE(value, this.offset);
 
         this.offset += 4; 
     }
@@ -59,8 +59,8 @@ export default class BufferWriter {
     {
         this.assertWithinRange(4);
 
-        if(littleEndian) this.buffer.writeUint16LE(value, this.offset)
-        else this.buffer.writeUint16BE(value, this.offset);
+        if(littleEndian) this.buffer.writeUInt32LE(value, this.offset)
+            else this.buffer.writeUint32BE(value, this.offset);
 
         this.offset += 4; 
     }
