@@ -14,9 +14,11 @@ export default class SocketPacket extends BufferWriter
     ) {
         super(Buffer.alloc(SocketPacket.MAX_PACKET_SIZE));
 
+        this.writeInt(0)
         this.writeInt(id);
         this.writeString(encryption);
 
         this.headerSize = this.currentOffset;
+        this.buffer.writeInt32LE(this.headerSize);
     }
 }
