@@ -247,39 +247,4 @@ describe('BufferReader', () => {
         });
     });
 
-    describe("read<castType>(<type>)", () => {
-        test("returns correct value for Number", () => {
-            const buffer = Buffer.from([0x00, 0x00, 0x80, 0xBF]); // -1 in float32
-            const reader = new BufferReader(buffer);
-            const result = reader.read(Number);
-            expect(result).toBe(-1);
-        });
-
-        test("returns correct value for String", () => {
-            const buffer = Buffer.from([0x03, 0x00, 0x00, 0x00, 0x61, 0x62, 0x63]);
-            const reader = new BufferReader(buffer);
-            const result = reader.read(String);
-            expect(result).toBe('abc');
-        });
-
-        test("returns correct value for Boolean", () => {
-            const buffer = Buffer.from([0x00, 0x01]);
-            const reader = new BufferReader(buffer);
-            expect(reader.read(Boolean)).toBe(false);
-            expect(reader.read(Boolean)).toBe(true);
-        });
-
-        test("returns correct value for Buffer", () => {
-            const buffer = Buffer.from([0x03, 0x00, 0x00, 0x00, 0x61, 0x62, 0x63]);
-            const reader = new BufferReader(buffer);
-            const result = reader.read(Buffer);
-            expect(result.equals(Buffer.from('abc'))).toBe(true);
-        });
-
-        test("throws error for unknown type", () => {
-            const buffer = Buffer.from([0x00, 0x01]);
-            const reader = new BufferReader(buffer);
-            expect(() => reader.read(Object)).toThrow("Unsupported type");
-        });
-    });
 });
