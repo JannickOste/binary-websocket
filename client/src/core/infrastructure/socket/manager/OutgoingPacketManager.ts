@@ -13,6 +13,7 @@ import AESInterface from "../../../domain/crypt/AESInterface";
 import WebSocketClient from "../WebSocketClient";
 import WebSocketClientInterface from "../../../domain/socket/WebSocketClientInterface";
 import SocketPacket from "../../../domain/socket/packet/SocketPacket";
+import OutgoingPacketServiceInterface from "../../../domain/socket/services/OutgoingPacketServiceInterface";
 
 @provide(types.Core.Infrastructure.Socket.Manager.OutgoingPacketManager, bindingScopeValues.Singleton)
 export default class OutgoingPacketManager implements OutgoingPacketManagerInterface {
@@ -26,42 +27,26 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
 
     constructor(
         @multiInject(types.Core.Infrastructure.Socket.OutgoingPacketBuilderInterface) packetBuilders: OutgoingPacketBuilderInterface[],
-        @inject(types.Core.Infrastructure.Crypt.IRSAInterface) private readonly rsa: RSAInterface,
-        @inject(types.Core.Infrastructure.Crypt.IAESInterface) private readonly aes: AESInterface,
-        @inject(types.Core.Infrastructure.Socket.WebSocketClient) private readonly client: WebSocketClientInterface
+        @inject(types.Core.Infrastructure.Socket.WebSocketClient) private readonly client: WebSocketClientInterface,
+        @inject(types.Core.Infrastructure.Socket.Services.OutgoingSocketPacketService) private readonly packetService: OutgoingPacketServiceInterface
     ) {
         packetBuilders.forEach(handler => this.outgoingPacketBuilderMap.set(handler.id, handler));
     }
 
     public async dispatchToServer(id: ClientPacket, ...data: unknown[]): Promise<void> {
-        const packetHandler = this.outgoingPacketBuilderMap.get(id);
-        if(packetHandler)
+        const packetBuilder = this.outgoingPacketBuilderMap.get(id);
+        let packet: SocketPacket | undefined = undefined;
+        if(packetBuilder)
         {
-            let packet = await packetHandler.build(
+            packet = await packetBuilder.build(
                 ... data
             );
+        }
 
-            const body = packet.buffer.subarray(packet.headerSize, packet.currentOffset)
-            if(AES.ALLOWED_MODES.includes(packet.encryption))
-            {
-                const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
-
-                const cypherData = this.aes.encrypt(body, this.aes.serverKey);
-                encryptedPacket.writeBuffer(cypherData.iv);
-                encryptedPacket.writeBuffer(cypherData.data);
-
-                packet = encryptedPacket;
-            }
-
-            if(RSA.ALLOWED_MODES.includes(packet.encryption))
-            {
-                const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
-                encryptedPacket.writeBuffer(this.rsa.encrypt(body, this.rsa.publicServerKey))
-
-                packet = encryptedPacket;
-            }
-
-            return this.client.socket.send(packet.buffer.subarray(0, packet.currentOffset));
+        if(packet)
+        {
+            const payload = this.packetService.parseBufferFromPacket(packet)
+            return this.client.socket.send(payload);
         } 
         
         console.log(`Packet handler with id: ${id} not found`)
