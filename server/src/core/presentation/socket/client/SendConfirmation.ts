@@ -1,8 +1,8 @@
 import { bindingScopeValues } from "inversify";
 import types from "../../../../di";
 import { provide } from "../../../domain/decorators/provide";
-import Client from "../../../domain/socket/Client";
-import ClientPacket from "../../../domain/socket/ClientPacket";
+import Client from "../../../domain/socket/client/Client";
+import ClientPacket from "../../../domain/socket/client/ClientPacket";
 import IncommingPacketProcessorInterface from "../../../domain/socket/IncommingPacketProcessorInterface";
 import BufferReader from "../../../domain/utils/BufferReader";
 

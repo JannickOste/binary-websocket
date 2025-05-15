@@ -1,8 +1,8 @@
 import { bindingScopeValues, inject, multiInject } from "inversify";
 import OutgoingPacketManagerInterface from "../../../domain/socket/manager/OutgoingPacketManagerInterface";
-import ServerPacket from "../../../domain/socket/ServerPacket";
+import ServerPacket from "../../../domain/socket/server/ServerPacket";
 import OutgoingPacketBuilderInterface from "../../../domain/socket/OutgoingPacketBuilderInterface";
-import Client from "../../../domain/socket/Client";
+import Client from "../../../domain/socket/client/Client";
 import SocketPacket from "../../../domain/socket/SocketPacket";
 import AES from "../../crypt/AES";
 import RSA from "../../crypt/RSA";

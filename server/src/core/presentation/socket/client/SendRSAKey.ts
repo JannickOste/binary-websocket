@@ -1,12 +1,12 @@
 import { bindingScopeValues } from "inversify";
 import types from "../../../../di";
 import { provide } from "../../../domain/decorators/provide";
-import Client from "../../../domain/socket/Client";
-import ClientPacket from "../../../domain/socket/ClientPacket";
+import Client from "../../../domain/socket/client/Client";
+import ClientPacket from "../../../domain/socket/client/ClientPacket";
 import IncommingPacketProcessorInterface from "../../../domain/socket/IncommingPacketProcessorInterface";
 import BufferReader from "../../../domain/utils/BufferReader";
 import OutgoingPacketManager from "../../../infrastructure/socket/manager/OutgoingPacketManager";
-import ServerPacket from "../../../domain/socket/ServerPacket";
+import ServerPacket from "../../../domain/socket/server/ServerPacket";
 
 @provide(types.Core.Infrastructure.Socket.IncommingPacketProcessorInterface, bindingScopeValues.Singleton)
 export default class SendRSAKey implements IncommingPacketProcessorInterface {

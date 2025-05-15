@@ -1,8 +1,8 @@
 import WebSocket from 'ws';
 import { provide } from '../../domain/decorators/provide';
 import SocketPacket from '../../domain/socket/SocketPacket';
-import Client from '../../domain/socket/Client';
-import ServerPacket from '../../domain/socket/ServerPacket';
+import Client from '../../domain/socket/client/Client';
+import ServerPacket from '../../domain/socket/server/ServerPacket';
 import { bindingScopeValues, inject, unmanaged } from 'inversify';
 import types from '../../../di';
 import OutgoingPacketManagerInterface from '../../domain/socket/manager/OutgoingPacketManagerInterface';

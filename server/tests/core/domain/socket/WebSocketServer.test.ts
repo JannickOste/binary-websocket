@@ -1,8 +1,8 @@
 import WebSocket from 'ws';
 import WebSocketServer from '../../../../src/core/infrastructure/socket/WebSocketServer';
-import Client from '../../../../src/core/domain/socket/Client';
+import Client from '../../../../src/core/domain/socket/client/Client';
 import types, { container } from '../../../../src/di';
-import ServerPacket from '../../../../src/core/domain/socket/ServerPacket';
+import ServerPacket from '../../../../src/core/domain/socket/server/ServerPacket';
 
 const mockOutgoingPacketManager = {
     dispatchToClient: jest.fn(),
