@@ -1,5 +1,3 @@
-import TextEncoding from "./TextEnoding";
-
 export default class BufferReader {
     private offset: number = 0;
 
@@ -113,7 +111,7 @@ export default class BufferReader {
         return Buffer.from(buffer);
     }
 
-    public readString(encoding: TextEncoding = "utf-8"): string {
+    public readString(encoding: BufferEncoding = "utf-8"): string {
         const decoder = new TextDecoder(encoding);
 
         return decoder.decode(this.readBuffer());
@@ -121,14 +119,5 @@ export default class BufferReader {
 
     public readNumber(littleEndian: boolean = true): number {
         return this.readFloat(littleEndian);
-    }
-
-    public read<T>(type?: { new(...args: any[]): T } | Function): T {
-        if (type === Number) return this.readFloat() as T;
-        if (type === String) return this.readString() as T;
-        if (type === Boolean) return this.readBoolean() as T;
-        if (type === Buffer) return this.readBuffer() as T;
-
-        throw new Error("Unsupported type");
     }
 }
