@@ -2,88 +2,108 @@ import "reflect-metadata";
 import { Container } from "inversify";
 import crypto from "crypto";
 import AES from "../../../../src/core/infrastructure/crypt/AES";
+import EncryptionType from "../../../../src/core/domain/crypt/EncryptionType";
 
-describe("AES Encryption and Decryption", () => {
+describe("AES", () => {
   let container: Container;
+  let key: Buffer;
+  let data: Buffer;
+  let aes: AES;
 
-  beforeEach(() => {
+  beforeAll(() => {
     container = new Container();
-    container.bind<AES>("AES").to(AES).inRequestScope(); 
+    container.bind<AES>("AES").to(AES).inRequestScope();
+
+    key = crypto.randomBytes(32);
+    data = Buffer.from("This is a test message");
+    aes = new AES(key);
   });
 
-  it("should correctly encrypt and decrypt with AES-256-CBC mode", () => {
-    const key = crypto.randomBytes(32); 
-    const data = Buffer.from("This is a test message");
+  describe("constructor", () => {
+      describe("Should throw an error if the key length isnt 32bit", () => {
+          expect(() => new AES(crypto.randomBytes(0))).toThrow();
+      })
+  })
 
-    const aes = new AES(key, 'aes-256-cbc');
-    const { data: encryptedData, iv: encryptionIv, tag } = aes.encrypt(data, key);
+  describe("encrypt", () => {
+    it("should correctly encrypt with AES-256-CBC mode", () => {
+      const result = aes.encrypt(data, key, EncryptionType.AES256CBC);
 
-    const decryptedData = aes.decrypt(encryptedData, encryptionIv, tag);
+      expect(result.data).toBeInstanceOf(Buffer);
+      expect(result.iv).toBeInstanceOf(Buffer);
+    });
 
-    expect(decryptedData.toString()).toEqual(data.toString()); 
+    it("should correctly encrypt with AES-256-ECB mode", () => {
+      const result = aes.encrypt(data, key, EncryptionType.AES256ECB);
+
+      expect(result.data).toBeInstanceOf(Buffer);
+      expect(result.iv.equals(Buffer.alloc(0))).toBe(true);
+    });
+
+    it("should correctly encrypt with AES-256-GCM mode", () => {
+      const result = aes.encrypt(data, key, EncryptionType.AES256GCM);
+
+      expect(result.data).toBeInstanceOf(Buffer);
+      expect(result.iv).toBeInstanceOf(Buffer);
+      expect(result.tag).toBeInstanceOf(Buffer);
+    });
+
+    it("should generate different encrypted data for different inputs", () => {
+      const data1 = Buffer.from("Test message 1");
+      const data2 = Buffer.from("Test message 2");
+
+      const encryptedData1 = aes.encrypt(data1, key, EncryptionType.AES256CBC);
+      const encryptedData2 = aes.encrypt(data2, key, EncryptionType.AES256CBC);
+
+      expect(encryptedData1.data).not.toEqual(encryptedData2.data);
+    });
+
+    it("should throw an error for unsupported AES mode", () => {
+      expect(() =>
+        aes.encrypt(data, key, 'aes-256-xyz' as EncryptionType)
+      ).toThrow("Unsupported AES mode");
+    });
   });
 
-  it("should correctly encrypt and decrypt with AES-256-ECB mode", () => {
-    const key = crypto.randomBytes(32); 
-    const data = Buffer.from("This is a test message");
+  describe("decrypt", () => {
+    it("should correctly decrypt AES-256-CBC", () => {
+      const { data: encryptedData, iv, tag } = aes.encrypt(data, key, EncryptionType.AES256CBC);
+      const decrypted = aes.decrypt(encryptedData, iv, EncryptionType.AES256CBC, tag);
 
-    const aes = new AES(key, 'aes-256-ecb');
-    const { data: encryptedData, iv: encryptionIv, tag } = aes.encrypt(data, key);
+      expect(decrypted.toString()).toEqual(data.toString());
+    });
 
-    const decryptedData = aes.decrypt(encryptedData, encryptionIv, tag);
+    it("should correctly decrypt AES-256-ECB", () => {
+      const { data: encryptedData, iv, tag } = aes.encrypt(data, key, EncryptionType.AES256ECB);
+      const decrypted = aes.decrypt(encryptedData, iv, EncryptionType.AES256ECB, tag);
 
-    expect(decryptedData.toString()).toEqual(data.toString()); 
-  });
+      expect(decrypted.toString()).toEqual(data.toString());
+    });
 
-  it("should correctly encrypt and decrypt with AES-256-GCM mode", () => {
-    const key = crypto.randomBytes(32); 
-    const data = Buffer.from("This is a test message");
+    it("should correctly decrypt AES-256-GCM", () => {
+      const { data: encryptedData, iv, tag } = aes.encrypt(data, key, EncryptionType.AES256GCM);
+      const decrypted = aes.decrypt(encryptedData, iv, EncryptionType.AES256GCM, tag);
 
-    const aes = new AES(key, 'aes-256-gcm');
-    const { data: encryptedData, iv: encryptionIv, tag } = aes.encrypt(data, key);
+      expect(decrypted.toString()).toEqual(data.toString());
+    });
 
-    const decryptedData = aes.decrypt(encryptedData, encryptionIv, tag);
+    it("should throw an error if GCM decryption is missing tag", () => {
+      const { data: encryptedData, iv } = aes.encrypt(data, key, EncryptionType.AES256GCM);
 
-    expect(decryptedData.toString()).toEqual(data.toString()); 
-  });
+      expect(() => aes.decrypt(encryptedData, iv, EncryptionType.AES256GCM)).toThrow("Tag is required for GCM decryption");
+    });
 
-  it("should throw an error for unsupported AES mode in encrypt", () => {
-    expect(() => {
-        new AES(crypto.randomBytes(32), 'aes-256-xyz' as any);
-    }).toThrow("Unsupported AES mode. Supported modes are: aes-256-cbc, aes-256-ecb, aes-256-gcm");
-  });
+    it("should work with AES-256-ECB and empty IV", () => {
+      const { data: encryptedData, iv, tag } = aes.encrypt(data, key, EncryptionType.AES256ECB);
+      const decrypted = aes.decrypt(encryptedData, iv, EncryptionType.AES256ECB, tag);
 
-  it("should throw an error if GCM decryption is missing tag", () => {
-    const key = crypto.randomBytes(32);
-    const iv = crypto.randomBytes(16);
-    const aes = new AES(key, 'aes-256-gcm');
+      expect(decrypted.toString()).toEqual(data.toString());
+    });
 
-    const encryptedData = aes.encrypt(Buffer.from("data"), key);
-    expect(() => aes.decrypt(encryptedData.data, iv)).toThrow("Tag is required for GCM decryption");
-  });
-
-  it("should generate different encrypted data for different inputs", () => {
-    const key = crypto.randomBytes(32);
-    const aes = new AES(key, 'aes-256-cbc');
-
-    const data1 = Buffer.from("Test message 1");
-    const data2 = Buffer.from("Test message 2");
-
-    const encryptedData1 = aes.encrypt(data1, key);
-    const encryptedData2 = aes.encrypt(data2, key);
-
-    expect(encryptedData1.data).not.toEqual(encryptedData2.data);
-  });
-
-  it("should work with AES-256-ECB with empty IV", () => {
-    const key = crypto.randomBytes(32);
-    const aes = new AES(key, 'aes-256-ecb');
-
-    const data = Buffer.from("Test message");
-    const encryptedData = aes.encrypt(data, key);
-
-    const decryptedData = aes.decrypt(encryptedData.data, Buffer.alloc(0));
-
-    expect(decryptedData.toString()).toEqual(data.toString());
+    it("should throw an error for unsupported AES mode", () => {
+      expect(() =>
+        aes.decrypt(data, key, 'aes-256-xyz' as EncryptionType)
+      ).toThrow("Unsupported AES mode");
+    });
   });
 });
