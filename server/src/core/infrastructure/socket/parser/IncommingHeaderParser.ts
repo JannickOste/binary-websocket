@@ -4,9 +4,10 @@ import { provide } from "../../../domain/decorators/provide";
 import SocketPacket from "../../../domain/socket/packet/SocketPacket";
 import SocketPacketHeader from "../../../domain/socket/packet/SocketPacketHeader";
 import BufferReader from "../../../domain/utils/BufferReader";
+import IncommingHeaderParserInterface from "../../../domain/socket/parser/IncommingHeaderParserInterface";
 
 @provide(types.Core.Infrastructure.Socket.Parser.IncommingHeaderParserInterface, bindingScopeValues.Singleton)
-export default class IncommingHeaderParser implements IncommingHeaderParser
+export default class IncommingHeaderParser implements IncommingHeaderParserInterface
 { 
     public parse(packet: SocketPacket): SocketPacketHeader
     {
