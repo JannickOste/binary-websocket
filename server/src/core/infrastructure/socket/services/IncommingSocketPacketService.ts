@@ -20,7 +20,7 @@ export default class IncommingPacketService implements IncommingPacketServiceInt
         @inject(types.Core.Infrastructure.Crypt.IRSAInterface) private readonly rsa: RSAInterface
     ) {}
 
-    public parsePacket(client: Client, packet: SocketPacket): IncommingSocketPacket
+    public parsePacket(client: Client, packet: Buffer): IncommingSocketPacket
     {
         const header = this.headerParser.parse(packet);
         if(!Object.values(ClientPacket).includes(header.id))
@@ -33,7 +33,7 @@ export default class IncommingPacketService implements IncommingPacketServiceInt
             throw new Error("Invalid encryption type received from client");
         }
 
-        const packetPayload = packet.buffer.subarray(header.headerSize);
+        const packetPayload = packet.subarray(header.headerSize);
         const packetContent =  this.contentParser.parse(client, header.encryption as EncryptionType, packetPayload);
         return {
             header: header,
