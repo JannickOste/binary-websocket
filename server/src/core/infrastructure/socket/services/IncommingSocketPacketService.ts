@@ -1,4 +1,4 @@
-import { inject } from "inversify";
+import { bindingScopeValues, inject } from "inversify";
 import EncryptionType from "../../../domain/crypt/EncryptionType";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
 import ClientPacket from "../../../domain/socket/client/ClientPacket";
@@ -9,7 +9,9 @@ import types from "../../../../di";
 import Client from "../../../domain/socket/client/Client";
 import IncommingHeaderParserInterface from "../../../domain/socket/parser/IncommingHeaderParserInterface";
 import IncommingContentParserInterface from "../../../domain/socket/parser/IncommingContentParserInterface";
+import { provide } from "../../../domain/decorators/provide";
 
+@provide(types.Core.Infrastructure.Socket.Services.IncommingSocketPacketService, bindingScopeValues.Singleton)
 export default class IncommingPacketService implements IncommingPacketServiceInterface { 
 
     constructor(
