@@ -5,12 +5,13 @@ export default class BufferWriter {
     }
 
     constructor(
-        public readonly buffer: Buffer 
+        public readonly buffer: Buffer,
+        adjustOffset: boolean = false
     ) {
+        if(adjustOffset) this.offset = buffer.byteLength;
     }
 
-    protected assertWithinRange(size: number): void { 
-
+    protected assertWithinBufferRange(size: number): void { 
         if (this.offset + size > this.buffer.byteLength) {
             throw new Error("BufferOverflow: Not enough space in buffer to write data");
         }
@@ -18,16 +19,19 @@ export default class BufferWriter {
 
     public writeByte(byte: number): void 
     {
-        this.assertWithinRange(1);
+        this.assertWithinBufferRange(1);
         
         this.buffer.writeInt8(byte)
+
+        this.offset++;
     }
 
     public writeUByte(byte: number): void 
     {
-        this.assertWithinRange(1);
+        this.assertWithinBufferRange(1);
 
         this.buffer.writeUint8(byte)
+        this.offset++;
     }
 
     public writeBoolean(value: boolean): void {
@@ -35,7 +39,7 @@ export default class BufferWriter {
     }
 
     public writeShort(value: number, littleEndian: boolean = true): void {
-        this.assertWithinRange(2);
+        this.assertWithinBufferRange(2);
 
         if(littleEndian) this.buffer.writeInt16LE(value, this.offset)
         else this.buffer.writeInt16BE(value, this.offset);
@@ -45,7 +49,7 @@ export default class BufferWriter {
 
     public writeUShort(value: number, littleEndian: boolean = true)
     {
-        this.assertWithinRange(2)
+        this.assertWithinBufferRange(2)
 
         if(littleEndian) this.buffer.writeUint16LE(value, this.offset)
         else this.buffer.writeUint16BE(value, this.offset);
@@ -54,7 +58,7 @@ export default class BufferWriter {
     }
 
     public writeInt(value: number, littleEndian: boolean = true): void {
-        this.assertWithinRange(4);
+        this.assertWithinBufferRange(4);
 
         if(littleEndian) this.buffer.writeInt32LE(value, this.offset)
         else this.buffer.writeInt32BE(value, this.offset);
@@ -64,7 +68,7 @@ export default class BufferWriter {
 
     public writeUInt(value: number, littleEndian: boolean = true)
     {
-        this.assertWithinRange(4);
+        this.assertWithinBufferRange(4);
 
         if(littleEndian) this.buffer.writeUInt32LE(value, this.offset)
             else this.buffer.writeUint32BE(value, this.offset);
@@ -73,7 +77,7 @@ export default class BufferWriter {
     }
 
     public writeFloat(value: number, littleEndian: boolean = true): void {
-        this.assertWithinRange(4);
+        this.assertWithinBufferRange(4);
 
         if(littleEndian) this.buffer.writeFloatLE(value, this.offset)
         else this.buffer.writeFloatBE(value, this.offset);
@@ -83,7 +87,7 @@ export default class BufferWriter {
 
     public writeDouble(value: number, littleEndian: boolean = true) 
     {
-        this.assertWithinRange(8);
+        this.assertWithinBufferRange(8);
 
         if(littleEndian) this.buffer.writeDoubleLE(value, this.offset)
         else this.buffer.writeDoubleBE(value, this.offset)
@@ -99,7 +103,7 @@ export default class BufferWriter {
 
     public writeBuffer(value: Buffer): void 
     {
-        this.assertWithinRange(value.byteLength + 4);
+        this.assertWithinBufferRange(value.byteLength + 4);
 
         this.writeInt(value.byteLength);
         for(const byte of value)
