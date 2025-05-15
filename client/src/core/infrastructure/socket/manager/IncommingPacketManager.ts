@@ -2,7 +2,7 @@ import { bindingScopeValues, inject, multiInject } from "inversify";
 import types from "../../../../di";
 import EncryptionType from "../../../domain/crypt/EncryptionType";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
-import Client from "../../../domain/socket/Client";
+import Client from "../../../domain/socket/client/Client";
 import IncommingPacketProcessorInterface from "../../../domain/socket/IncommingPacketProcessorInterface";
 import OutgoingPacketManagerInterface from "../../../domain/socket/manager/OutgoingPacketManagerInterface";
 import IncommingPacketManagerInterface from "../../../domain/socket/manager/IncommingPacketManagerInterface";
@@ -38,46 +38,4 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
             return;
         } 
     }
-    // public async processPacket(
-    //     data: Buffer
-    // ) {
-    //     let packetReader = new BufferReader(data);
-    //     const headerSize = packetReader.readInt();
-    //     const id = packetReader.readInt()
-    //     const encryption = packetReader.readString();
-
-    //     if(encryption !== EncryptionType.NONE)
-    //     {
-    //         if(AES.ALLOWED_MODES.includes(encryption))
-    //         {
-    //             console.log("Decrypting RSA Packet")
-    //             const iv = packetReader.readBuffer();
-    //             const data = packetReader.readBuffer();
-    //             const tag = encryption === EncryptionType.AES256GCM ? packetReader.readBuffer() : undefined;
-
-    //             packetReader = new BufferReader(this.aes.decrypt(data, iv, tag));
-    //         }
-
-    //         if(RSA.ALLOWED_MODES.includes(encryption))
-    //         {
-    //             console.log("Decrypting RSA Packet")
-    //             const data = packetReader.readBuffer();
-    //             console.dir(packetReader.buffer)
-    //             const decryptedData = this.rsa.decrypt(data);
-
-    //             console.log(`${data.byteLength} => ${decryptedData.byteLength}`)
-
-    //             packetReader = new BufferReader(decryptedData)
-    //         }
-    //     }
-        
-    //     console.log(`Packet received with id: ${id}, encryption: ${encryption}`)    
-    //     const packetHandler = this.clientPacketHandlerMap.get(id);
-    //     if (packetHandler) {
-    //         packetHandler.process( packetReader);
-    //         return;
-    //     } 
-
-    //     console.log("Failed to parse packet.");
-    // }
 }

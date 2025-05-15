@@ -1,7 +1,7 @@
 import { bindingScopeValues, inject } from "inversify";
 import EncryptionType from "../../../domain/crypt/EncryptionType";
-import Client from "../../../domain/socket/Client";
-import ClientPacket from "../../../domain/socket/ClientPacket";
+import Client from "../../../domain/socket/client/Client";
+import ClientPacket from "../../../domain/socket/client/ClientPacket";
 import IncommingPacketProcessorInterface from "../../../domain/socket/IncommingPacketProcessorInterface";
 import OutgoingPacketBuilderInterface from "../../../domain/socket/OutgoingPacketBuilderInterface";
 import BufferReader from "../../../domain/utils/BufferReader";

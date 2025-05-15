@@ -1,7 +1,7 @@
 import { WebSocket } from "ws";
-import AES from "../../infrastructure/crypt/AES";
-import AESInterface from "../crypt/AESInterface";
-import types, { container } from "../../../di";
+import AES from "../../../infrastructure/crypt/AES";
+import AESInterface from "../../crypt/AESInterface";
+import types, { container } from "../../../../di";
 
 export default class Client 
 {

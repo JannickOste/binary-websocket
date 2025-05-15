@@ -1,14 +1,14 @@
 import { bindingScopeValues, inject, multiInject } from "inversify";
 import OutgoingPacketManagerInterface from "../../../domain/socket/manager/OutgoingPacketManagerInterface";
-import ServerPacket from "../../../domain/socket/ServerPacket";
+import ServerPacket from "../../../domain/socket/server/ServerPacket";
 import OutgoingPacketBuilderInterface from "../../../domain/socket/OutgoingPacketBuilderInterface";
-import Client from "../../../domain/socket/Client";
+import Client from "../../../domain/socket/client/Client";
 import AES from "../../crypt/AES";
 import RSA from "../../crypt/RSA";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
 import types, { container } from "../../../../di";
 import { provide } from "../../../domain/decorators/provide";
-import ClientPacket from "../../../domain/socket/ClientPacket";
+import ClientPacket from "../../../domain/socket/client/ClientPacket";
 import AESInterface from "../../../domain/crypt/AESInterface";
 import WebSocketClient from "../WebSocketClient";
 import WebSocketClientInterface from "../../../domain/socket/WebSocketClientInterface";

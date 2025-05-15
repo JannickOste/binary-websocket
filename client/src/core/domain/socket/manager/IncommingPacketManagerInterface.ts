@@ -1,5 +1,5 @@
 import BufferReader from "../../utils/BufferReader";
-import Client from "../Client";
+import Client from "../client/Client";
 
 interface IncommingPacketManagerInterface {  
     processPacket(data: Buffer): Promise<void>;

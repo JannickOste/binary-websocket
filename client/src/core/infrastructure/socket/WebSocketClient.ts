@@ -2,7 +2,7 @@ import { bindingScopeValues, inject } from "inversify";
 import types, { container } from "../../../di";
 import { provide } from "../../domain/decorators/provide";
 import IncommingPacketManagerInterface from "../../domain/socket/manager/IncommingPacketManagerInterface";
-import Client from "../../domain/socket/Client";
+import Client from "../../domain/socket/client/Client";
 import { unmanaged } from "inversify";
 import { WebSocket } from "ws";
 import BufferReader from "../../domain/utils/BufferReader";

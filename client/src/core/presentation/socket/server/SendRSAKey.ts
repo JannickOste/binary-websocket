@@ -3,7 +3,7 @@ import OutgoingPacketManagerInterface from "../../../domain/socket/manager/Outgo
 import IncommingPacketProcessorInterface from "../../../domain/socket/IncommingPacketProcessorInterface";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
 import { provide } from "../../../domain/decorators/provide";
-import ClientPacket from "../../../domain/socket/ClientPacket";
+import ClientPacket from "../../../domain/socket/client/ClientPacket";
 import BufferReader from "../../../domain/utils/BufferReader";
 import types from "../../../../di";
 import OutgoingPacketManager from "../../../infrastructure/socket/manager/OutgoingPacketManager";

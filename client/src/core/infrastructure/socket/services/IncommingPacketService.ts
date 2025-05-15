@@ -6,7 +6,7 @@ import SocketPacket from "../../../domain/socket/packet/SocketPacket";
 import IncommingPacketServiceInterface from "../../../domain/socket/services/IncommingPacketServiceInterface";
 import types from "../../../../di";
 import { provide } from "../../../domain/decorators/provide";
-import ServerPacket from "../../../domain/socket/ServerPacket";
+import ServerPacket from "../../../domain/socket/server/ServerPacket";
 import IncommingHeaderParserInterface from "../../../domain/socket/parsers/IncommingHeaderParserInterface";
 import IncommingContentParserInterface from "../../../domain/socket/parsers/IncommingContentParserInterface";
 
