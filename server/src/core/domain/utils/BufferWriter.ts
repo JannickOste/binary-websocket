@@ -1,73 +1,98 @@
 export default class BufferWriter {
-    private readonly dataview: DataView;
-
-    public get buffer(): Buffer {
-        return Buffer.from(this.dataview.buffer.slice(this.dataview.byteOffset, this.dataview.byteOffset + this.dataview.byteLength));
-    }
-
     private offset: number = 0;
     public get currentOffset(): number { 
         return this.offset;
     }
 
     constructor(
-        buffer: Buffer 
+        public readonly buffer: Buffer 
     ) {
-        this.dataview = new DataView(buffer.buffer, buffer.byteOffset, buffer.length);
     }
 
-    protected assertBufferSize(size: number): void { 
+    protected assertWithinRange(size: number): void { 
 
-        if (this.offset + size > this.dataview.byteLength) {
+        if (this.offset + size > this.buffer.byteLength) {
             throw new Error("BufferOverflow: Not enough space in buffer to write data");
         }
     }
 
-    protected writeByte(value: number): void 
+    public writeByte(byte: number): void 
     {
-        this.assertBufferSize(1);
-        this.dataview.setInt8(this.offset, value);
-        this.offset++;
+        this.assertWithinRange(1);
+
+        this.buffer[this.offset++] = (byte < 128 ? byte - 256 : byte);
     }
 
-    protected writeShort(value: number, littleEndian: boolean = true): void {
-        this.assertBufferSize(2);
+    public writeBoolean(value: boolean): void {
+        this.writeByte(Number(value))
+    }
 
-        this.dataview.setInt16(this.offset, value, littleEndian);
+    public writeShort(value: number, littleEndian: boolean = true): void {
+        this.assertWithinRange(2);
+
+        if(littleEndian) this.buffer.writeInt16LE(value, this.offset)
+        else this.buffer.writeInt16BE(value, this.offset);
+
         this.offset += 2;
     }
 
-    protected writeInt(value: number, littleEndian: boolean = true): void {
-        this.assertBufferSize(4);
-        
-        this.dataview.setInt32(this.offset, value, littleEndian);
+    public writeUShort(value: number, littleEndian: boolean = true)
+    {
+        this.assertWithinRange(2)
+
+        if(littleEndian) this.buffer.writeUint16LE(value, this.offset)
+        else this.buffer.writeUint16BE(value, this.offset);
+
+        this.offset += 2; 
+    }
+
+    public writeInt(value: number, littleEndian: boolean = true): void {
+        this.assertWithinRange(4);
+
+        if(littleEndian) this.buffer.writeInt16LE(value, this.offset)
+        else this.buffer.writeUint16BE(value, this.offset);
+
+        this.offset += 4; 
+    }
+
+    public writeUInt(value: number, littleEndian: boolean = true)
+    {
+        this.assertWithinRange(4);
+
+        if(littleEndian) this.buffer.writeUint16LE(value, this.offset)
+        else this.buffer.writeUint16BE(value, this.offset);
+
+        this.offset += 4; 
+    }
+
+    public writeFloat(value: number, littleEndian: boolean = true): void {
+        this.assertWithinRange(4);
+
+        if(littleEndian) this.buffer.writeFloatLE(value, this.offset)
+        else this.buffer.writeFloatBE(value, this.offset);
+
         this.offset += 4;
     }
 
-    protected writeFloat32(value: number, littleEndian: boolean = true): void {
-        this.assertBufferSize(4);
+    public writeDouble(value: number, littleEndian: boolean = true) 
+    {
+        this.assertWithinRange(8);
 
-        this.dataview.setFloat32(this.offset, value, littleEndian);
-        this.offset += 4;
+        if(littleEndian) this.buffer.writeDoubleLE(value, this.offset)
+        else this.buffer.writeDoubleBE(value, this.offset)
+    
+        this.offset += 8; 
     }
 
-    protected writeFloat64(value: number, littleEndian: boolean = true): void {
-        this.assertBufferSize(8);
-
-        this.dataview.setFloat64(this.offset, value, littleEndian);
-        this.offset += 8;
+    public writeDate(value: Date, littleEndian: boolean = true)
+    {
+        this.writeDouble(value.getTime(), littleEndian)
     }
     
-    protected writeBoolean(value: boolean): void {
-        this.assertBufferSize(1);
 
-        this.dataview.setUint8(this.offset, value ? 1 : 0);
-        this.offset++;
-    }
-
-    protected writeBuffer(value: Buffer): void 
+    public writeBuffer(value: Buffer): void 
     {
-        this.assertBufferSize(value.byteLength + 4);
+        this.assertWithinRange(value.byteLength + 4);
 
         this.writeInt(value.byteLength);
         for(const byte of value)
@@ -76,7 +101,7 @@ export default class BufferWriter {
         }
     }
 
-    protected writeString(value: string): void {
+    public writeString(value: string): void {
         const encoder = new TextEncoder();
         const encoded = encoder.encode(value);
 
@@ -84,10 +109,10 @@ export default class BufferWriter {
     }
 
     public write<T>(value: T, littleEndian: boolean = true): void {
-        if (typeof value === "number") return this.writeFloat32(value, littleEndian);
+        if (typeof value === "number") return this.writeFloat(value, littleEndian);
         if (typeof value === "boolean") return this.writeBoolean(value);
         if (typeof value === "string") return this.writeString(value);
-        if (value instanceof Date) return this.writeFloat64(value.getTime(), littleEndian);
+        if (value instanceof Date) return this.writeDate(value);
         if (value instanceof Buffer || value instanceof Uint8Array) return this.writeBuffer(Buffer.from(value));
     
         throw new Error(`Unsupported type for writing: ${typeof value}`);
