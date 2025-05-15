@@ -1,65 +1,109 @@
-export default class BufferReader 
-{
-    private readonly dataview: DataView;
-
-    public get buffer(): Buffer {
-        return Buffer.from(this.dataview.buffer.slice(this.dataview.byteOffset, this.dataview.byteOffset + this.dataview.byteLength));
-    }
-
+export default class BufferReader {
     private offset: number = 0;
 
-    
+
     constructor(
-        buffer: Buffer
+        public readonly buffer: Buffer
     ) {
-        this.dataview = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-    }
-    
 
-
-    public readByte(): number 
-    {
-        const value = this.dataview.getInt8(this.offset);
-        this.offset++;
-
-        return value;
     }
 
-    public readShort(littleEndian: boolean = true): number {
-        const value = this.dataview.getInt16(this.offset, littleEndian);
-        this.offset += 2; 
-
-        return value;
+    private assertWithinRange(byteLength: number) {
+        if (this.offset + byteLength > this.buffer.byteLength) {
+            throw new Error("BufferOverflow: Outside of buffer range");
+        }
     }
 
-    public readInt(littleEndian: boolean = true): number {
-        const value = this.dataview.getInt32(this.offset, littleEndian);
-        this.offset += 4; 
-        
-        return value;
+    public readByte(): number {
+        this.assertWithinRange(1);
+
+        const byte = this.buffer[this.offset++];
+
+        return byte < 128 ? byte
+            : byte - 256;
     }
 
-    public readFloat32(littleEndian: boolean = true): number {
-        const value = this.dataview.getFloat32(this.offset, littleEndian);
-        this.offset += 4;
+    public readUByte(): number {
+        this.assertWithinRange(1);
 
-        return value;
+        const byte = this.buffer[this.offset++];
+
+        return byte;
     }
 
     public readBoolean(): boolean {
-        const value = this.dataview.getUint8(this.offset);
-        this.offset++;
+        this.assertWithinRange(1);
 
-        return value === 1;
+        const byte = this.buffer[this.offset++];
+
+        if (![0, 1].includes(byte)) {
+            throw new Error("BufferError: Failed to read byte, invalid value received");
+        }
+
+        return byte === 1;
     }
 
-    public readBuffer(): Buffer
-    {
+    public readShort(littleEndian: boolean = true): number {
+        this.assertWithinRange(2);
+
+        const short = littleEndian ? this.buffer.readInt16LE(this.offset)
+            : this.buffer.readInt16BE(this.offset);
+
+        this.offset += 2;
+
+        return short;
+    }
+
+    public readUShort(littleEndian: boolean = true): number {
+        this.assertWithinRange(2);
+
+        const ushort = littleEndian ? this.buffer.readUInt16LE(this.offset)
+            : this.buffer.readUInt16BE(this.offset);
+
+        this.offset += 2;
+
+        return ushort;
+    }
+
+    public readInt(littleEndian: boolean = true): number {
+        this.assertWithinRange(4);
+
+        const int = littleEndian ? this.buffer.readInt32LE(this.offset)
+            : this.buffer.readInt32BE(this.offset);
+
+        this.offset += 4;
+
+        return int;
+    }
+
+    public readUInt(littleEndian: boolean = true): number {
+        this.assertWithinRange(4);
+
+        const uint = littleEndian ? this.buffer.readUInt32LE(this.offset)
+            : this.buffer.readUInt32BE(this.offset);
+
+        this.offset += 4;
+
+        return uint;
+    }
+
+    public readFloat(littleEndien: boolean = true): number {
+        this.assertWithinRange(4);
+
+        const float32 = littleEndien ? this.buffer.readFloatLE(this.offset)
+            : this.buffer.readFloatBE(this.offset);
+
+        this.offset += 4;
+
+        return float32;
+    }
+
+
+    public readBuffer(): Buffer {
         const length = this.readInt();
 
         const buffer = new Uint8Array(length)
-        for(let index = 0; index < length; index++)
-        {
+        for (let index = 0; index < length; index++) {
             const currentByte = this.readByte();
             buffer[index] = currentByte;
         }
@@ -67,23 +111,13 @@ export default class BufferReader
         return Buffer.from(buffer);
     }
 
-    public readString(): string {
-        const decoder = new TextDecoder();
-        
+    public readString(encoding: BufferEncoding = "utf-8"): string {
+        const decoder = new TextDecoder(encoding);
+
         return decoder.decode(this.readBuffer());
     }
 
     public readNumber(littleEndian: boolean = true): number {
-        return this.readFloat32(littleEndian);
-    }
-
-    public read<T>(type?: { new(...args: any[]): T } | Function): T {
-        const resolvedType = type ?? Number;
-        if (type === Number) return this.readFloat32() as T;
-        if (type === String) return this.readString() as T;
-        if (type === Boolean) return this.readBoolean() as T;
-        if (type === Buffer) return this.readBuffer() as T;
-    
-        throw new Error("Unsupported type");
+        return this.readFloat(littleEndian);
     }
 }

@@ -47,8 +47,8 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
                 const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
 
                 const cypherData = this.aes.encrypt(body, this.aes.serverKey);
-                encryptedPacket.write(cypherData.iv);
-                encryptedPacket.write(cypherData.data);
+                encryptedPacket.writeBuffer(cypherData.iv);
+                encryptedPacket.writeBuffer(cypherData.data);
 
                 packet = encryptedPacket;
             }
@@ -56,7 +56,7 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
             if(RSA.ALLOWED_MODES.includes(packet.encryption))
             {
                 const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
-                encryptedPacket.write(this.rsa.encrypt(body, this.rsa.publicServerKey))
+                encryptedPacket.writeBuffer(this.rsa.encrypt(body, this.rsa.publicServerKey))
 
                 packet = encryptedPacket;
             }
