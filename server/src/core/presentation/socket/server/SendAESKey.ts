@@ -5,7 +5,7 @@ import { provide } from "../../../domain/decorators/provide";
 import Client from "../../../domain/socket/client/Client";
 import OutgoingPacketBuilderInterface from "../../../domain/socket/OutgoingPacketBuilderInterface";
 import ServerPacket from "../../../domain/socket/server/ServerPacket";
-import SocketPacket from "../../../domain/socket/SocketPacket";
+import SocketPacket from "../../../domain/socket/packet/SocketPacket";
 import { inject } from "inversify";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
 
@@ -22,7 +22,7 @@ export default class SendAESKey extends SocketPacket implements OutgoingPacketBu
     }
 
     async build(client: Client, ...data: unknown[]): Promise<SocketPacket> {
-        this.write(client.aes.key);
+        this.writeBuffer(client.aes.key);
         
         return this;
     }

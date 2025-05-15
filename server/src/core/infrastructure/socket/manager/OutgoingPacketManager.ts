@@ -3,7 +3,7 @@ import OutgoingPacketManagerInterface from "../../../domain/socket/manager/Outgo
 import ServerPacket from "../../../domain/socket/server/ServerPacket";
 import OutgoingPacketBuilderInterface from "../../../domain/socket/OutgoingPacketBuilderInterface";
 import Client from "../../../domain/socket/client/Client";
-import SocketPacket from "../../../domain/socket/SocketPacket";
+import SocketPacket from "../../../domain/socket/packet/SocketPacket";
 import AES from "../../crypt/AES";
 import RSA from "../../crypt/RSA";
 import RSAInterface from "../../../domain/crypt/RSAInterface";
@@ -43,8 +43,8 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
                 const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
 
                 const cypherData = client.aes.encrypt(body, client.aesKey);
-                encryptedPacket.write(cypherData.iv);
-                encryptedPacket.write(cypherData.data);
+                encryptedPacket.writeBuffer(cypherData.iv);
+                encryptedPacket.writeBuffer(cypherData.data);
 
                 packet = encryptedPacket;
             }
@@ -53,7 +53,7 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
             {
                 const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
                 const encryptedData = this.rsa.encrypt(body, client.rsaKey);
-                encryptedPacket.write(encryptedData);
+                encryptedPacket.writeBuffer(encryptedData);
 
 
                 console.log(`Original length: ${body.byteLength} to ${encryptedData.byteLength}`)

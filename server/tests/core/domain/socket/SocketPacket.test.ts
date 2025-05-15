@@ -1,5 +1,5 @@
 import EncryptionType from "../../../../src/core/domain/crypt/EncryptionType";
-import SocketPacket from "../../../../src/core/domain/socket/SocketPacket";
+import SocketPacket from "../../../../src/core/domain/socket/packet/SocketPacket";
 
 describe("SocketPacket", () => {    
     describe("constructor", () => {
