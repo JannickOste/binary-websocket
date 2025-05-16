@@ -37,6 +37,6 @@ export default class IncommingPacketManager implements IncommingPacketManagerInt
             return;
         } 
 
-        client.socket.close();
+        return client.socket.close();
     }
 }

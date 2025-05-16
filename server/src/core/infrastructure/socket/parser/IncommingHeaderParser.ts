@@ -13,14 +13,12 @@ export default class IncommingHeaderParser implements IncommingHeaderParserInter
     {
         const reader = new BufferReader(buffer);
 
-        const headerSize = reader.readInt();
         const id: number = reader.readInt();
         const encryption = reader.readString()
 
         return new SocketPacketHeader(
             id, 
-            encryption,
-            headerSize
+            encryption
         )
     }
 }

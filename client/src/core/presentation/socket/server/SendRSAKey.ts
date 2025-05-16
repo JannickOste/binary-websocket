@@ -18,8 +18,8 @@ export default class SendRSAKey implements IncommingPacketProcessorInterface {
     }
 
     async process(packetReader: BufferReader): Promise<void> {
-        this.rsa.publicServerKey = packetReader.readString();
-        
+        const rsaKey = packetReader.readString()
+        this.rsa.publicServerKey = rsaKey;
         OutgoingPacketManager.Singleton.dispatchToServer(ClientPacket.SendRSAKey)
     }
 }

@@ -35,9 +35,7 @@ export default class IncommingContentParser implements IncommingContentParserInt
 
             if(RSA.ALLOWED_MODES.includes(encryption))
             {
-                const data = packetContentReader.readBuffer();
-
-                packetContent = this.rsa.decrypt(data);
+                packetContent = this.rsa.decrypt(packetContent);
             }
         }
 

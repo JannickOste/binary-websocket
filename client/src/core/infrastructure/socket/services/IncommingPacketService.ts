@@ -9,6 +9,7 @@ import { provide } from "../../../domain/decorators/provide";
 import ServerPacket from "../../../domain/socket/server/ServerPacket";
 import IncommingHeaderParserInterface from "../../../domain/socket/parsers/IncommingHeaderParserInterface";
 import IncommingContentParserInterface from "../../../domain/socket/parsers/IncommingContentParserInterface";
+import BufferReader from "../../../domain/utils/BufferReader";
 
 @provide(types.Core.Infrastructure.Socket.Services.IncommingSocketPacketService, bindingScopeValues.Singleton)
 export default class IncommingPacketService implements IncommingPacketServiceInterface { 
@@ -20,7 +21,10 @@ export default class IncommingPacketService implements IncommingPacketServiceInt
 
     public parsePacket(packet: Buffer): IncommingSocketPacket
     {
-        const header = this.headerParser.parse(packet);
+        const packetReader = new BufferReader(packet)
+
+        const headerBuffer = packetReader.readBuffer();
+        const header = this.headerParser.parse(headerBuffer);
         if(!Object.values(ServerPacket).includes(header.id))
         {
             throw new Error("Invalid client packet received");
@@ -31,7 +35,8 @@ export default class IncommingPacketService implements IncommingPacketServiceInt
             throw new Error("Invalid encryption type received from client");
         }
 
-        const packetPayload = packet.subarray(header.headerSize);
+        const packetPayload = packetReader.readBuffer();
+        console.log(`Packet received: (id: ${header.id}, encryption: ${header.encryption}, headerSize: ${headerBuffer.byteLength}, contentLength: ${packetPayload.byteLength})`)
         const packetContent =  this.contentParser.parse(header.encryption as EncryptionType, packetPayload);
         return {
             header: header,

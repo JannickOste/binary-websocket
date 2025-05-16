@@ -10,10 +10,11 @@ import RSAInterface from "../../../domain/crypt/RSAInterface";
 import WebSocketServer from "../WebSocketServer";
 import types, { container } from "../../../../di";
 import { provide } from "../../../domain/decorators/provide";
+import OutgoingPacketService from "../services/OutgoingPacketService";
 
 @provide(types.Core.Infrastructure.Socket.Manager.OutgoingPacketManager, bindingScopeValues.Singleton)
 export default class OutgoingPacketManager implements OutgoingPacketManagerInterface {
-    private readonly serverPacketHandlerMap: Map<ServerPacket, OutgoingPacketBuilderInterface> = new Map();
+    private readonly packetBuildersMap: Map<ServerPacket, OutgoingPacketBuilderInterface> = new Map();
     
     // Needs better solution, temp fix for circulair dependency when wanting to inject in IncommingPackets to dispatch outgoing.
     public static get Singleton(): OutgoingPacketManagerInterface 
@@ -23,45 +24,26 @@ export default class OutgoingPacketManager implements OutgoingPacketManagerInter
 
     constructor(
         @multiInject(types.Core.Infrastructure.Socket.OutgoingPacketBuilderInterface) packetBuilders: OutgoingPacketBuilderInterface[],
-        @inject(types.Core.Infrastructure.Crypt.IRSAInterface) private readonly rsa: RSAInterface
+        @inject(types.Core.Infrastructure.Socket.Services.OutgoingSocketPacketService) private readonly packetService: OutgoingPacketService
     ) {
-        packetBuilders.forEach(handler => this.serverPacketHandlerMap.set(handler.id, handler));
+        packetBuilders.forEach(handler => this.packetBuildersMap.set(handler.id, handler));
     }
 
     public async dispatchToClient(client: Client, id: ServerPacket, ... data: unknown[]): Promise<void> {
-        const packetHandler = this.serverPacketHandlerMap.get(id);
-        if(packetHandler)
+         const packetBuilder = this.packetBuildersMap.get(id);
+        let packet: SocketPacket | undefined = undefined;
+        if(packetBuilder)
         {
-            let packet = await packetHandler.build(
-                client,
-                data
+            packet = await packetBuilder.build(
+                client, ... data
             );
+        }
 
-            const body = packet.buffer.subarray(packet.headerSize, packet.currentOffset)
-            if(AES.ALLOWED_MODES.includes(packet.encryption))
-            {
-                const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
-
-                const cypherData = client.aes.encrypt(body, client.aesKey);
-                encryptedPacket.writeBuffer(cypherData.iv);
-                encryptedPacket.writeBuffer(cypherData.data);
-
-                packet = encryptedPacket;
-            }
-
-            if(RSA.ALLOWED_MODES.includes(packet.encryption))
-            {
-                const encryptedPacket = new SocketPacket(packet.id, packet.encryption);
-                const encryptedData = this.rsa.encrypt(body, client.rsaKey);
-                encryptedPacket.writeBuffer(encryptedData);
-
-
-                console.log(`Original length: ${body.byteLength} to ${encryptedData.byteLength}`)
-                console.log(`Packet size original: ${packet.currentOffset} to ${encryptedPacket.currentOffset}`)
-                packet = encryptedPacket;
-            }
-
-            return client.socket.send(packet.buffer.subarray(0, packet.currentOffset));
+        if(packet)
+        {
+            const payload = this.packetService.parseBufferFromPacket(client, packet)
+            
+            return client.socket.send(payload);
         } 
         
         console.log(`Packet handler with id: ${id} not found`)
