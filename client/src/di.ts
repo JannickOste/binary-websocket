@@ -23,7 +23,9 @@ const types = {
                 },
                 Parser: {
                     IncommingHeaderParserInterface: Symbol.for("Core/Domain/Socket/Parser/IncommingHeaderParserInterface"),
-                    IncommingContentParserInterface: Symbol.for("Core/Domain/Socket/Parser/IncommingContentParserInterface")
+                    IncommingContentParserInterface: Symbol.for("Core/Domain/Socket/Parser/IncommingContentParserInterface"),
+                    OutgoingHeaderParserInterface: Symbol.for("Core/Domain/Socket/Parser/OutgoingHeaderParserInterface"),
+                    OutgoingContentParserInterface: Symbol.for("Core/Domain/Socket/Parser/OutgoingContentParserInterface")
                 },
                 OutgoingPacketBuilderInterface: Symbol.for("Core/Domain/Socket/OutgoingPacketBuilderInterface"),
                 IncommingPacketProcessorInterface: Symbol.for("Core/Domain/Socket/IncommingPacketProcessorInterface"),
